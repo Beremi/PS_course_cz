@@ -37,3 +37,7 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+CV7/.ipynb_checkpoints/
+
+CV7/tabulka.csv

@@ -67,6 +67,7 @@ p_sude = 2*p_liche
 pravd = c(p_liche, p_sude, p_liche, p_sude, p_liche, p_sude, p_liche, p_sude, 
           p_liche, p_sude, p_liche, p_sude, p_liche, p_sude, p_liche, p_sude, 
           p_liche, p_sude, p_liche, p_sude)
+pravd
 #pravdepodobnost je
 sum(pravd[15:20])
 
@@ -95,10 +96,12 @@ permutace(12)/variace_opak(12,12)
 
 
 # rozdělíme na bloky I=(A,B) a II=(C,D,E)
-PI = (1 - 0.1)*(1 - 0.3)
-PII = 1 - (0.2*0.3*0.2)
+PI = 1 - (1 - 0.1)*(1 - 0.3)
+PI
+PII = 0.2*0.3*0.2
+PII
 # výsledek
-PI*PII
+(1 - PI)*(1-PII)
 
 # * Příklad 6. ####
 # Ohrada má obdélníkový tvar, východní a západní stěna mají délku 40 m, jižní a severní
@@ -109,7 +112,7 @@ PI*PII
 # geometrická pravděpodobnost
 ohrada = 40*100
 #blize k jihu
-blize_J = 20*100 - 20*20
+blize_J = 20*60 + 20*20
 #pravdepodobnosti
 blize_J/ohrada
 
@@ -185,6 +188,63 @@ bayes(P_B = P_B, P_AB = P_SB, k = 2)
 # P(A) = P(K_lic)*P(A|K_lic)+P(K_rub)*P(D_lic|K_rub)
 # rovnice 120/320=0.5*x+0.5*0.5
 (120/320-0.5^2)/0.5
+
+# * Bonus - Monty Hall Problem ####
+# 
+# Začneme s vygenerováním n instancí soutěže - cena bude náhodný index dveří (1,2,3) za
+# kterými se může nacházet cena
+
+
+n = 10000 # počet pokusů
+cena = sample.int(n = 3, size = n, replace = TRUE) # náhdný výběr dveří
+head(cena) # head vykresli prvních 6 prvků/řádků
+
+# Totéž pro naši původní volbu - náhodný index dveří.
+
+
+volba_orig = sample.int(n = 3, size = n, replace = TRUE) # původní volba
+head(volba_orig)
+
+# V prvním kole moderátor jedny prázdné dveře otevře, takto se to dá nasimulovat:
+
+
+otevrene_dvere = rep(0, n) # inicializace vektoru
+dvere_c = 1:3 # pomocná proměnná - identifikátory dveří
+for (i in 1:n){
+    dvere_k_otevereni = c(TRUE, TRUE, TRUE) # inicializace 
+    dvere_k_otevereni[cena[i]] = FALSE # nesmíme otevřít dveře s cenou
+    dvere_k_otevereni[volba_orig[i]] = FALSE # ani naše vybrané dveře
+    # ve zbytku jsou buď 2 (pokud jsme se trefili) nebo 1 dveře (pokud ne)
+    idx_dvere = dvere_c[dvere_k_otevereni]
+    if (length(idx_dvere) == 1){
+        otevrene_dvere[i] = idx_dvere # pokud jedny otevřeme je
+    } else { # pokud 2 tak jedny náhodně vybereme a otevřeme je
+        otevrene_dvere[i] = sample(x = idx_dvere, size = 1)
+    }
+}
+head(otevrene_dvere)
+
+# Naše nová volba pokud se tak rozhodneme - součet indexů je 1+2+3=6 takže pokud my máme
+# vybraný nějaký index, dále nějaký index se otevře, tak do zbytku 6 jsou ty třetí =
+# naše nová volba.
+
+
+nova_volba = 6 - (volba_orig + otevrene_dvere)
+head(nova_volba)
+
+# Úspěšnost při originální volbě:
+
+
+p_orig = sum(cena == volba_orig)/n
+p_orig
+
+# Úspěšnost při výměně:
+
+
+p_zmena = sum(cena == nova_volba)/n
+p_zmena
+
+p_orig + p_zmena
 
 
 

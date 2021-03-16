@@ -7,7 +7,8 @@ USER ${NB_USER}
 USER root
 RUN apt-get install -y libxml2-dev
 
-# Install binaries (see https://datawookie.netlify.com/blog/2019/01/docker-images-for-r-r-base-versus-r-apt/)
-RUN cat requirements-bin.txt | xargs apt-get install -y -qq
+RUN apt-get install -y r-cran-readxl
+RUN apt-get install -y r-cran-dplyr
+RUN apt-get install -y r-cran-openxlsx
 
 USER ${NB_USER}

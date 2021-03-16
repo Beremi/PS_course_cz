@@ -1,4 +1,0 @@
-r-cran-readxl
-r-cran-dplyr
-r-cran-openxlsx
-r-cran-moments

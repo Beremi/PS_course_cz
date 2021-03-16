@@ -4,4 +4,4 @@ install.packages("openxlsx")
 install.packages("moments")
 
 install.packages('IRkernel')
-IRkernel::installspec(user = FALSE)
+IRkernel::installspec(user = TRUE)

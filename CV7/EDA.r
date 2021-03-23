@@ -1,29 +1,13 @@
 # ......................................................................................
-# .................. Ccičení 7. Preprocesing dat a explorační analýza ..................
-# ......................... Adéla Vrtková, Martina Litschmannová........................
+# .................. Cvičení 7. Preprocesing dat a explorační analýza ..................
+# .................. Adéla Vrtková, Martina Litschmannová, Michal Béreš.................
 # ......................................................................................
 
 # Nezobrazuje-li se vám text korektně, nastavte File \ Reopen with Encoding... na UTF-8
 # Pro zobrazení obsahu skriptu použijte CTRL+SHIFT+O
 # Pro spouštění příkazů v jednotlivých řádcích použijte CTRL+ENTER
 
-#   Základní skript ####
-# 
-# 
-#   Máme data, a co dál?
-#    1. Spustíme potřebné balíčky, které obsahují další statistické funkce
-#    2. Nastavíme pracovní adresář, odkud importujeme data, popř. kam chceme ukládat
-# výstupy
-#    3. Importujeme data (z pracovního adresáře, z internetu)
-#    4. Pre-processing ->  
-#     1. Podíváme se na data
-#     2. uložíme si data ve více formátech (každá funkce má "raději" jiný formát)
-#    5. Analýza kvalitativních proměnných
-#    6. Analýza kvantitativních proměnných
-#    7. Identifikace a rozhodnutí o vyloučení/ponechání odlehlých pozorování
-# 
-# 
-#  * 1. Jak nainstalovat a spustit rozšiřující balíček funkcí?  ####
+#   1. Rozšiřující balíčky funkcí - instalace a načítání ####
 
 
 # Instalování balíčků nutné pouze jednou (pokud je již nemáte)
@@ -37,7 +21,9 @@ library(dplyr)
 library(openxlsx)
 # obsahuje upozornění na přepsané funkce případně na starší verzi balíčku
 
-# * 2. Kde se ukládají generované výstupy, nastavení pracovního adresáře ####
+#  2. Pracovního adresář (working directory) - odkud načítáme a kam ukládáme data ####
+# - Pozor aktuální otebvřená složka v Rstudiu, případně umístění Rskriptu není
+# automaticky pracovní adresář
 
 
 # Výpis pracovního adresáře
@@ -52,9 +38,10 @@ setwd("./..") # zase zpátky
 
 getwd() # kontrola
 
-# * 3. Načtení datového souboru ####
+#  3. Načtení datového souboru ####
 
 
+# * Ze souboru CSV ####
 # Základní funkce - read.table, read.csv, read.csv2, ...
 # 
 # Záleží hlavně na formátu souboru (.txt, .csv), na tzv. oddělovači jednotlivých hodnot,
@@ -64,12 +51,20 @@ getwd() # kontrola
 # Načtení a uložení datového souboru ve formátu csv2 z pracovního adresáře
 data = read.csv2(file="aku.csv")
 
+data
+
+data = read.csv2(file="aku.csv", sep=";", quote="", skip=0, header=TRUE)
+data
+
+help(read.csv2)
+
 # Načtení a uložení datového souboru ve formátu csv2 z lokálního disku do datového rámce data
 data = read.csv2(file="./data/aku.csv")
 
 # Načtení a uložení datového souboru ve formátu csv2 z internetu do datového rámce data
 data = read.csv2(file="http://am-nas.vsb.cz/lit40/DATA/aku.csv")
 
+# * Z Excelu (souboru xlsx) ####
 # Načtení a uložení datového souboru ve formátu xlsx z lokálního disku do datového rámce
 # data
 # 
@@ -82,15 +77,22 @@ data = read_excel("./data/aku.xlsx",
 
 head(data)
 
+# * Odstranění nepotřebných řádků/sloupců a pojmenování řádků/sloupců pro snadnější ####
+# adresování dat
+
+
+# indexování se zápornými indexy vrátí vše kromě hodnoty indexů
+# nemíchat záporné a kladné indexy!
 data = data[,-1] # odstraníme první sloupec s indexy
 head(data)
 
 # Přejmenování sloupců - je-li nutné
 colnames(data)=c("A5","B5","C5","D5","A100","B100","C100","D100") 
+head(data)
 
 # *** Poznámka (kterou je dobré dočíst až do konce....) ####
-# Vždy je možné importovat pomocí "Import Dataset" z okna Environment bez nutnosti psát
-# kód
+# (v Rstudiu) je možné importovat pomocí "Import Dataset" z okna Environment bez
+# nutnosti psát kód
 # 
 # V tom případě ale nesmí být v "cestě" k souboru žádné speciální znaky (háčky, čárky).
 # Jinak se objeví error.
@@ -104,8 +106,40 @@ colnames(data)=c("A5","B5","C5","D5","A100","B100","C100","D100")
 # Pokud budete mít problém, s tím, že nějaká funkce nebude brát sloupec z "tibble"
 # jakožto non-numeric output, můžete to napravit příkazem pull: data[,1] nahradit
 # pull(data,1)
-# 
-# * 4. Pre-processing dat ####
+
+
+#  4. Pre-processing dat + knihovna Dplyr ####
+# ** Přehled funkcí knihovny Dplyr ####
+# - **%>%** je takzvaný pipe operátor, typické využití je "res = data %>% operace", kde
+# výsledkem je operace opalikovaná na data
+# - **select(...)** je jednou z operací kterou můžeme vložit do "pipe" operátoru -
+# slouží k výběru dat
+#  - select(1) - vybere první sloupec
+#  - select(A5) - vybere sloupec se jménem A5
+#  - select(1,3,5) - vybere sloupce 1,3,5
+# - **mutate(novy_sloupec=...)** je operace, které vyrobí v datovém rámci nový datový
+# sloupec pomocí zadaného výpočtu nad aktuálními sloupci
+#  - data %>% mutate(C=A-B) vyrobí v datovém rámci "data" nový sloupec s názvem "C" jako
+# rozdíl hodnot ve stávajícím sloupci "A" a "B"
+# - **filter(...)** vyfiltruje z dat hodnoty splňující zadané požadavky
+#  - data %>% filter(vyrobce=="A" | vyrobce=="B") vrátí datový soubor, který má ve
+# sloupci "vyrobce" pouze hodnoty "A" nebo "B"
+#  - data %>% filter(vyrobce=="A", hodnoty>1000) pokud požadavky píšeme za sebou
+# (oddělené čárkou) chápeme to jako a zároveň
+# - **summarise(...)** vypočte předepsanéčíslené charakteristiky v rámci zadaných
+# sloupců (vhodné pro kombinaci s group.by)
+#  - data %>% summarise(prum=mean(kap5),median=median(kap5)) 
+# - **arrange(...)** vzestupné, případně sestupné seřazení řádků
+#  - data %>% arrange(pokles) vzestupně
+#  - data %>% arrange(desc(pokles)) sestupně
+# - **group_by(...)** seskupení dat dle unikátních hodnot v zadaném sloupci
+#  - data %>% group_by(vyrobce)
+#  
+# Velice užitečný Dplyr "cheat sheet" naleznete zde:
+# https://github.com/rstudio/cheatsheets/raw/master/data-transformation.pdf
+
+
+# ** Výběry sloupců/řádků ####
 
 
 # Výpis datového souboru
@@ -134,43 +168,49 @@ data %>% select(C5)
 
 # Uložení prvního a pátého sloupce dat. rámce data do dat. rámce pokus
 pokus = data[,c(1,5)]
+head(pokus)
 
 # nebo pomocí funkce z dplyr
 pokus = data %>% select(1,5)
+head(pokus)
 
 # nebo pomocí názvů
-pokus = data %>% select(A5,A100)
+naz_sl = "A100"
+pokus = data %>% select(A5, naz_sl)
+head(pokus)
 
 # ......................................................................................
+# 
+# Vylučování dat ze souboru.
 
 
 # Vyloučení prvního a pátého sloupce z dat. rámce data a uložení do dat. rámce pokus
 pokus = data[,-c(1,5)]
+head(pokus)
 
 # nebo pomocí dplyr
 pokus = data %>% select(-1, -5)
+head(pokus)
 
 # nebo pomocí názvů
 pokus = data %>% select(-A5,-A100)
+head(pokus)
 
 # ......................................................................................
 # Úprava dat do několika menších logických celků s různou strukturou
 # 
 # Pozn. při ukládání dat mysleme na přehlednost v názvech
+# ** Základní převod jednoduché datové matice do standardního datového formátu  ####-
+# stack(...)
 
 
 data5 = data[,1:4] # z dat vybereme ty sloupce, které odpovídají měřením po 5 cyklech
 colnames(data5) = c("A","B","C","D") # přejmenujeme sloupce
+head(data5)
+
 data5S = stack(data5)         # a převedeme do st. datového formátu 
 colnames(data5S) = c("kap5","vyrobce") # a ještě jednou upravíme názvy sloupců
-
-# Prozkoumejte strukturu data5 a data5S
-
-
-
-
-# ......................................................................................
-
+head(data5S)
 
 # Totéž provedeme pro měření provedené po 100 cyklech
 data100 = data[,5:8] # z dat vybereme ty sloupce, které odpovídají měřením po 100 cyklech
@@ -178,29 +218,35 @@ colnames(data100) = c("A","B","C","D") # přejmenujeme sloupce
 data100S = stack(data100)         # a převedeme do st. datového formátu 
 colnames(data100S) = c("kap100","vyrobce") # a ještě jednou upravíme názvy sloupců
 
-# ......................................................................................
-
-
 # Nakonec si ještě vytvoříme datový soubor ve st. datovém formátu se všemi údaji
 dataS = cbind(data5S,data100S) # sloučení "podle sloupců"
+head(dataS)
+
 dataS = dataS[,-2] # vynecháme nadbytečný druhý sloupec
 dataS = na.omit(dataS) # vynecháme řádky s NA hodnotami
+head(dataS)
 
 # **!!! S funkci na.omit zacházejte extrémně opatrně, aby jste nechtěně nepřišli o data
 # !!!**
 
 
 # ......................................................................................
+# 
+# ** Definování nových sloupců v datovém rámci ####
 
 
 # Definování nové proměnné pokles
-dataS$pokles=dataS$kap5-dataS$kap100
+dataS$pokles = dataS$kap5 - dataS$kap100
+
+head(dataS)
 
 # nebo pomocí funkce z balíčku dplyr
 dataS = dataS %>% mutate(pokles=kap5-kap100)
 
-# ......................................................................................
+# ** Vybírání dat ze standardního datového formátu ####
 
+
+dataS$kap5
 
 # Může se hodit - vytvoření samostatných proměnných
 a5 = dataS$kap5[dataS$vyrobce=="A"] # Třída (typ) numeric
@@ -208,8 +254,8 @@ a5
 
 # takto s výsledkem typu data frame
 a5.df = dataS %>%
-  filter(vyrobce=="A") %>%  # Vybere / vyfiltruje řádky odpovídající výrobci A
-  select(kap5)   # Vybere pouze hodnoty ve sloupci kap5, POZOR! - Třída (typ) data.frame
+  filter(vyrobce=="A") %>%  # vyfiltruje řádky odpovídající výrobci A
+  select(kap5)   # Vybere pouze hodnoty ve sloupci kap5,
 head(a5.df)
 
 # Ostatní samostatné proměnné (uveden pouze jeden způsob)
@@ -227,104 +273,64 @@ pokles.b=dataS$pokles[dataS$vyrobce=="B"]
 pokles.c=dataS$pokles[dataS$vyrobce=="C"]
 pokles.d=dataS$pokles[dataS$vyrobce=="D"]
 
-# ** Podrobnější okénko do funkcí knihovny dplyr ####
+# ** Podrobnější okénko do funkcí knihovny Dplyr - práce nad daty ve standardním ####
+# datovém formátu
 
 
 # Je nutné aplikovat na data ve st. datovém formátu !!!
 # 
 # Operátor pipe %>% - pomáhá při řetězení funkcí - v novém RStudiu klávesová zkratka
 # Ctrl+Shift+M
-# ......................................................................................
+# 
+# *** filter - aplikuje filtr na daný sloupec ####
 
 
 # filter - vybere / vyfiltruje řádky na základě daných podmínek
 # Výběr výrobků od výrobce A
-dataS %>% 
-  filter(vyrobce=="A")
+dataS %>% filter(vyrobce=="A")
 
 # Výběr výrobků od výrobce A nebo B
-dataS %>% 
-  filter(vyrobce=="A" | vyrobce=="B")  # | oddělující podmínky odpovídá logickému "nebo"
+# | oddělující podmínky odpovídá logickému "nebo"
+dataS %>% filter(vyrobce=="A" | vyrobce=="B")  
 
 # Výběr všech výrobků s poklesem o 200 mAh a větším od výrobce C
-dataS %>% 
-  filter(pokles>=200, vyrobce=="C")  # čárka oddělující podmínky odpovídá logickému "a zároveň"
+# čárka oddělující podmínky odpovídá logickému "a zároveň"
+dataS %>% filter(pokles>=200, vyrobce=="C")  
 
-# ......................................................................................
-
-
-# select - vybere sloupce podle jejich názvu nebo čísla
-# Výběr sloupce s údaji o výrobci podle názvu sloupce
-dataS %>% 
-  select(vyrobce)
-
-# Výběr sloupce s údaji o výrobci podle čísla sloupce
-dataS %>% 
-  select(3)
-
-# Co je bezpečnější/lepší?
-
-
-# ......................................................................................
+# *** mutate - vyrobí nový sloupec ####
 
 
 # mutate - přidá novou proměnnou nebo transformuje existující
 # Vytvoření nového sloupce pokles_Ah, který údává pokles kapacit v Ah (původní data v mAh, 1 Ah = 1000 mAh)
-dataS %>% 
-  mutate(pokles_Ah=pokles/1000)
+pokus = dataS %>% mutate(pokles_Ah=pokles/1000)
+head(pokus)
+# pozor! pokud výsledek s nový sloupcem nikam neuložíme, tak se pouze vypíše a zmizí
 
-# ......................................................................................
-# 
 # *** summarise - generuje souhrnné charakteristiky různých proměnných ####
 
 
 # Výpočet průměru a mediánu všech hodnot proměnné kap5
-dataS %>% 
-  summarise(prum=mean(kap5),median=median(kap5))
+dataS %>% summarise(prum=mean(kap5),median=median(kap5))
 
-# ......................................................................................
-# 
 # *** arrange - seřadí řádky podle zvolené proměnné ####
 
 
 # Vzestupné a sestupné seřazení řádků podle hodnoty poklesu
-dataS %>%
-  arrange(pokles)
+dataS %>% arrange(pokles)
 
-dataS %>%
-  arrange(desc(pokles))
+dataS %>% arrange(desc(pokles))
 
-# ......................................................................................
-# 
-# *** group_by - seskupí hodnoty do skupin podle zvolené proměnné - samotné v podstatě ####
-# "k ničemu"
+# *** group_by - seskupí hodnoty do skupin podle zvolené proměnné ####
 
 
-dataS %>%
-  group_by(vyrobce)
+# tabulka je "virtuálně" rozdělená na skupiny pro pozdější zpracování např. summarise
+dataS %>% group_by(vyrobce)
 
 # Ideální pro spočítání sumárních charakteristik pro každého výrobce zvlášť, např. průměru
 dataS %>%
   group_by(vyrobce) %>% 
-  summarise(prum=mean(kap5))
+  summarise(prum=mean(kap5), "směrodatná odchylka"=sd(kap5))
 
-# ......................................................................................
-# 
-# Otestujte své znalosti dplyr
-#  1. Určete minimální a maximální hodnotu poklesu kapacit pro jednotlivé výrobce
-#   1. Vytvořte nový sloupec pokles_rel, který bude určovat relativní pokles kapacity (v
-# %) vzhledem ke stavu po 5 cyklech.
-#   2. Poté vytvořte nový sloupec pokles_rel_dich, který bude obsahovat hodnotu "vetsi",
-# bude-li relativní pokles nad 10% a "mensi", bude-li relativní pokles menší nebo roven
-# 10 %
-# 
-# Řešení naleznete na úplném konci skriptu.
-
-
-
-
-# ......................................................................................
-# 
 # **Závěrečná poznámka k dplyr (kterou je dobré dočíst až do konce...)
 # Některé operace mohou vyhodit objekt typu "tibble".
 # Jedná se o modernější data.frame, nicméně v některých funkcích může dělat problémy a
@@ -333,9 +339,76 @@ dataS %>%
 # as.data.frame().**
 
 
+#  5. Převod dat do standardního datového formátu (u dvou nejčastějších formátu dat) ####
+# * Z dat ve formátu Datová matice ####
+
+
+data_DM = read_excel("./data/datova_matice.xlsx")
+head(data_DM)
+
+data_DM = data_DM[,-1]
+colnames(data_DM) = c("A22", "A5", "B22", "B5", "C22", "C5", "D22", "D5")
+head(data_DM)
+
+# ** Funkce reshape ####
+# Její parametry:
+# - **data** - data k převedení musí být fe formátu data.frame (as.data.frame(data))
+# - **direction** - kterým směrem chceme transformaci udělat
+#     - "long" - do standardního formátu
+#     - "wide" - zpátky do datové matice
+# - **varying** - názvy sloupců, které označují stejná data pro různé kategorie
+#     - je to list vektorů
+#     - každá položka listu je jedno měření
+#     - každý vektor je pak seznam sloupců
+# - **v.names** - názvy sloupců ve st. dat. formátu
+#     - počet názvů musí sedět na počet vektorů v varying
+# - **times** - názvy jednotlivých kategorií
+#     - POZOR!! musí být ve stejném pořadí jako u proměné varying
+# - **timevar** - název sloupce s kategoriemi
+
+
+data_DM_S=reshape(data=as.data.frame(data_DM),
+                  direction="long",
+                  varying=list(c("A5", "B5", "C5", "D5"),
+                               c("A22","B22","C22","D22")),
+                  v.names=c("5 C","22  C"),   
+                  times=c("Amber","Bright","Clear","Dim"),  
+                  timevar="vyrobce")
+head(data_DM_S)
+
+help(reshape)
+
+# a pokud bychom chtěli, můžeme převést data zpět
+data_DM_2=reshape(data=data_DM_S,
+                  direction="wide",
+                  varying=list(c("A5", "B5", "C5", "D5"),
+                               c("A22","B22","C22","D22")),
+                  v.names=c("5 C","22  C"),   
+                  times=c("Amber","Bright","Clear","Dim"),  
+                  timevar="vyrobce")
+head(data_DM_2)
+
+# * Z datového souboru, kde jsou kategorie v jednotlivých listech excelu ####
+
+
+data_A = read_excel("./data/po_listech.xlsx", sheet=1)
+head(data_A)
+data_B = read_excel("./data/po_listech.xlsx", sheet=2)
+data_C = read_excel("./data/po_listech.xlsx", sheet=3)
+data_D = read_excel("./data/po_listech.xlsx", sheet=4)
+
+data_A$vyrobce = "Amber"
+data_B$vyrobce = "Bright"
+data_C$vyrobce = "Clear"
+data_D$vyrobce = "Dim"
+head(data_A)
+
+data_PL_S = rbind(data_A, data_B, data_C, data_D)
+data_PL_S
+
+#  6. Explorační analýza a vizualizace kategoriální proměnné ####
+# 
 # ** Poznámky ke grafice v R ####
-
-
 #  základem jsou tzv. high-level funkce, které vytvoří graf (tj. otevřou grafické oknou
 # a vykreslí dle zadaných parametrů)
 #  na ně navazují tzv. low-level funkce, které něco do aktviního grafického okna
@@ -358,9 +431,6 @@ dataS %>%
 #  Jednodušeji pak v okně Plots -> Export
 
 
-# * 5. Explorační analýza a vizualizace kategoriální proměnné ####
-
-
 # Tabulka absolutních četností kategoriální proměnné výrobce...
 cetnosti=table(dataS$vyrobce)
 cetnosti #výpis - objekt typu "table" - většinou vhodnější, ale těžší převedení do typu data.frame
@@ -372,9 +442,7 @@ abs.cetnosti = dataS %>%
 
 abs.cetnosti #výpis - objekt typu "tibble" - hodí se, když potřebujeme jednoduše převést na typ data.frame
 
-# ......................................................................................
-# 
-# *** Tabulka relativních četností ####
+# ** Tabulka relativních četností ####
 
 
 # Přímým výpočtem
@@ -391,14 +459,17 @@ tabulka_abs_rel = dataS %>%
                     summarise(cetnost = n()) %>%   
                     mutate(rel_cet_proc = round(100*(cetnost / sum(cetnost) ),1) )
 tabulka_abs_rel # výpis
+t(tabulka_abs_rel)
 
 # U všech tabulek je potřeba pohlídat zaokrouhlení a s ním spojené riziko zaokrouhlovací chyby.
 # Postup pro rel.cetnosti a rel.cetnosti2 je stejný.
 rel.cetnosti=round(rel.cetnosti,digits=1) # zaokrouhlení na 1 desetinné místo
 rel.cetnosti[4]=100-sum(rel.cetnosti[1:3]) # ohlídání zaokrouhlovací chyby
+rel.cetnosti
 
 # Postup pro tabulka_abs_rel je jiný, a to kvůli jinému formátu (tibble)
 tabulka_abs_rel[4,3]=100-sum((tabulka_abs_rel[1:3,3]))
+tabulka_abs_rel
 
 # *** Vytvoření tabulky s absolutními i rel. četnostmi (bez dplyr). Máme: ####
 
@@ -411,7 +482,7 @@ tabulka=cbind(cetnosti,rel.cetnosti)  # sloučení tabulek
 colnames(tabulka)=c("četnost","rel.četnost (%)") # změna názvů sloupců
 tabulka
 
-# *** Uložení tabulky do csv souboru pro export do MS Excel ####
+# *** Uložení tabulky do csv souboru ####
 
 
 write.csv2(tabulka,file="tabulka.csv")
@@ -465,41 +536,9 @@ text(bp,
 
 # Zkuste využít předešlého kódu a vytvořit si sloupcový graf pro proměnnou Výrobce podle
 # sebe.
-# 
-# ......................................................................................
-# 
-# *** Koláčový graf ####
 
 
-# Základní koláčový graf vychází z tabulky četností, kterou máme nachystanou
-cetnosti
-pie(cetnosti)
-
-# Přidání názvu grafu a popisků, úprava barev
-pie(cetnosti,
-    col=topo.colors(4), 
-    main="Zastoupení výrobců ve výběru", # název grafu
-    labels=c("Výrobce A","Výrobce B","Výrobce C","Výrobce D")) # popisky
-
-# Pokročilejší popisky - sloučení abs. četností a rel. četností pomocí funkce paste
-# Funkce paste umožňuje sloučit textové řetězce a hodnoty proměnných, symbol "\n" tvoří nový řádek v textu
-pie(cetnosti,
-    col=heat.colors(4),
-    main="Zastoupení výrobců ve výběru",
-    labels=paste0("Výrobce ",names(cetnosti),"\n",cetnosti,"; ",rel.cetnosti,"%"))
-
-# Pro zájemce - balíček plotrix a funkce pie3D vytvoří 3D koláčový graf
-# 
-# Zkuste využít předešlého kódu a vytvořit koláčový graf pro proměnnou Výrobce podle
-# sebe.
-
-
-#  **Pie charts are a very bad way of displaying information.
-#  The eye is good at judging linear measures and bad at judging relative areas.
-#  A bar chart or dot chart is a preferable way of displaying this type of data.**
-
-
-# * 6. Explorační analýza a vizualizace kvantitativní proměnné ####
+#  7. Explorační analýza a vizualizace kvantitativní proměnné ####
 
 
 # Popisná statistika
@@ -543,12 +582,13 @@ length(dataS$kap5)
 
 library(moments)
 
-moments::skewness(a5)
+skewness(a5)
 
-moments::kurtosis(a5)-3
+kurtosis(a5)-3
 
-# Chceme-li spočítat danou charakteristiku pro proměnnou kapacita po 5 cyklech podle výrobců, můžeme použít funkci tapply
-tapply(dataS$kap5, dataS$vyrobce, mean, na.rm=T)
+# Chceme-li spočítat danou charakteristiku pro proměnnou kapacita po 5 cyklech 
+# podle výrobců, můžeme použít funkci tapply
+tapply(dataS$kap5, dataS$vyrobce, mean, na.rm=TRUE)
 
 # nebo pomocí dplyr - zde pozor na automatické (ne vždy správné zaokrouhlení)
 dataS %>% 
@@ -591,9 +631,8 @@ charakteristiky_dle_vyrobce =
 
 charakteristiky_dle_vyrobce
 
-# ......................................................................................
-# 
 # ** Krabicový graf ####
+# **Vykreslujeme pro originální data, můžeme doplnit i vykreslení pro data bez OP.**
 
 
 # Jednoduché a rychlé vykreslení pomocí základní funkce pouze pro výrobce C
@@ -624,17 +663,14 @@ boxplot(dataS$kap5~dataS$vyrobce) # grafické parametry lze nastavit obdobně ja
 
 boxplot(a5,b5,c5,d5)
 
-# ......................................................................................
-# 
-# *** Histogram ####
+# ** Histogram ####
+# **Vykreslujeme vždy pro data bez odlehlých pozorování!!**
 
 
 # Jednoduché a rychlé vykreslení
 hist(a5)
 
-hist(a5,breaks=10) # Co dělají různé hodnoty parametru breaks s grafem?
-
-hist(a5,breaks=10) # Co dělají různé hodnoty parametru breaks s grafem?
+hist(a5,breaks=20) # Co dělají různé hodnoty parametru breaks s grafem?
 
 # Již tradičně lze nastavit popisky, barvy a další parametry
 hist(a5, 
@@ -652,7 +688,7 @@ hist(a5,
      ylab="f(x)",
      col="cadetblue1", 
      border="grey",
-     freq=FALSE)	       # změna měřítka na ose y --> f(x)
+     freq=FALSE)          # změna měřítka na ose y --> f(x)
 lines(density(a5))        # připojí graf odhadu hustoty pravděpodobnosti
 # Generování hustoty normálního rozdělení a přidání k histogramu
 xfit=seq(min(a5), max(a5), length=40)     # generování hodnot pro osu x
@@ -665,7 +701,8 @@ lines(xfit, yfit, col="black", lwd=2)    # do posledního grafu přidání křiv
 
 
 
-# *** QQ-graf ####
+# ** QQ-graf ####
+# **Vykreslujeme vždy pro data bez odlehlých pozorování!!**
 
 
 # Jednoduché a velmi rychlé vykreslení...
@@ -681,8 +718,6 @@ qqline(a5)
 
 
 
-# ......................................................................................
-# 
 # Pro pokročilé a zájemce - automatizace, využití for-cyklu, více grafů do jednoho
 # obrázku
 # 
@@ -746,72 +781,135 @@ for (i in 1:4){
 }
 mtext("Kapacita akumulátorů po 5 cyklech (mAh)", cex = 1.5, outer=TRUE, side=3)
 
-# * 7. Identifikace odlehlých pozorování (a jejich odstranění z dat. rámce) ####
+#  8. Vnitřní hradby a identifikace odlehlých pozorování ####
+# * Ruční odstranění pomocí napočítání vnitřních hradeb ####
 
 
-# Zcela individuální posouzení - jednoduše si data seřadíme a podíváme se na "chvosty"
-# Při větším počtu dat velmi nepraktické, ale při menším rozsahu se může hodit.
-dataS %>%
-  filter(vyrobce=="A") %>% 
-  arrange(vyrobce,kap5)
+# separace datového sloupce pro výrobce A
+data_A_kap5 = dataS$kap5[dataS$vyrobce == "A"]
+data_A_kap5
 
-# ......................................................................................
+dolni_kvartil = quantile(data_A_kap5,0.25,na.rm=T)
+horni_kvartil = quantile(data_A_kap5,0.75,na.rm=T)
+IQR = horni_kvartil - dolni_kvartil  # mezikvartilové rozpěti
+dolni_mez = dolni_kvartil - 1.5*IQR  # výpočet dolní mezi vnitřních hradeb
+horni_mez = horni_kvartil + 1.5*IQR  # výpočet horní mezi vnitřních hradeb
+dolni_mez
+horni_mez
+
+data_A_kap5_bezOP = data_A_kap5
+# nastavíme hodnoty které jsou mimo meze na NA 
+data_A_kap5_bezOP[data_A_kap5>=horni_mez | data_A_kap5<=dolni_mez] = NA
+data_A_kap5_bezOP
+
+# můžeme hondoty NA smazat
+data_A_kap5_bezOP = na.omit(data_A_kap5_bezOP)
+
+# * Automatické odstranění dle box-plotu ####
 
 
-# Ruční odstranění - využití funkce boxplot s parametrem plot=F - s ohledem na výrobce
-pom = boxplot(data5S$kap5~data5S$vyrobce, plot = F)
-pom   # v pom$out jsou uložena odlehlá pozorování detekována metodou vnitřních hradeb,
-      # v pom$group je info, ze které skupiny odlehlá pozorování jsou
+pom = boxplot(data_A_kap5)
 
-# Tyto konkrétní hodnoty jsou pak označeny v novém sloupci kap5_out jako NA
-dataS$kap5_out=dataS$kap5
-dataS$kap5_out[dataS$vyrobce == "A" & dataS$kap5>=2023] = NA
-dataS$kap5_out[dataS$vyrobce == "C" & dataS$kap5==1848.4] = NA
-dataS$kap5_out[dataS$vyrobce == "D" & dataS$kap5==1650.3] = NA
+pom
 
-# ......................................................................................
+data_A_kap5_bezOP = data_A_kap5
+data_A_kap5_bezOP[data_A_kap5 %in% pom$out] = NA
+data_A_kap5_bezOP
+
+# ** Jak to udělat pro data ve standardním formátu s více kategoriemi? ####
 
 
-#..................................................................
-# Použití vnitřních hradeb - obecnější postup - uvedeno bez ohledu na výrobce!!!
-IQR = quantile(dataS$kap5,0.75,na.rm=T)-quantile(dataS$kap5,0.25,na.rm=T)  # mezikvartilové rozpěti
-dolni_mez = quantile(dataS$kap5,0.25,na.rm=T)-1.5*IQR  # výpočet dolní mezi vnitřních hradeb
-horni_mez = quantile(dataS$kap5,0.75,na.rm=T)+1.5*IQR  # výpočet horní mezi vnitřních hradeb
+head(data5S)
 
-# Pomocí funkce mutate definování nového sloupce, ve kterém budou odlehlá pozorování odstraněna
-dataS = dataS %>%
-  mutate(kap5_out=ifelse(kap5>=horni_mez | kap5<=dolni_mez, NA, kap5))
+pom = boxplot(data5S$kap5 ~ data5S$vyrobce)
+pom
 
-# nebo bez použití funkcí dplyr
-dataS$kap5_out=dataS$kap5
-dataS$kap5_out[dataS$kap5>=horni_mez | dataS$kap5<=dolni_mez]=NA
+# **Pozor, je to třeba udělat po jednotlivých kategoriích, jinak riskujeme smazání dat,
+# které do dat. souboru patří!!!**
+
+
+vyrobci = unique(data5S$vyrobce) # c("A","B",..)
+vyrobci
+
+data5S_bezOP = data5S
+
+for(vyrobce in vyrobci){
+    pom = boxplot(data5S$kap5[data5S$vyrobce == vyrobce],plot = FALSE)
+    data5S_bezOP$kap5[data5S$kap5 %in% pom$out & data5S$vyrobce == vyrobce]=NA
+}
+
+boxplot(data5S_bezOP$kap5 ~ data5S_bezOP$vyrobce)
 
 # **Analytik může vždy říct, že odlehlá pozorování odstraňovat nebude, ale tuto
 # informaci musí do zápisu o analýze uvést!**
 
 
-# * Otestujte své znalosti dplyr - řešení ####
+#  9. pravidlo 3 $\sigma$ a Čebyševova nerovnost ####
+# * Empirické ověření normality ####
+# **Vycházíme z dat po odstranění odlehlých pozorování:**
 
 
-# 1. Určete minimální a maximální hodnotu poklesu kapacit pro jednotlivé výrobce
-dataS %>% 
-  group_by(vyrobce) %>% 
-  summarise(minima=min(pokles),maxima=max(pokles))
+# použijeme data z ukázky odstranění op
+data_A_kap5_bezOP = na.omit(data_A_kap5_bezOP)
+data_A_kap5_bezOP
 
-# 2a. Vytvořte nový sloupec pokles_rel, který bude udávat relativní pokles kapacity (v
-# %) vzhledem ke stavu po 5 cyklech
+# Vykreslíme QQ graf a spočteme šikmost a špičatost:
+
+
+qqnorm(data_A_kap5_bezOP)
+qqline(data_A_kap5_bezOP)
+
+skewness(data_A_kap5_bezOP)
+kurtosis(data_A_kap5_bezOP) - 3 # jiná definice posunutá o 3
+
+# - tečky v QQ grafu musí ležet přibližně na čáře - tzn. kvantily odpovídají přibližně
+# kvantilům normálního rozdělení
+# - šikmost (skewness) musí ležet v intervalu <-2, 2>
+# - špočatost (kurtosis) musí ležet v intervalu <-2,2>
+#  - pozor výsledek Rkové funkce musíme ponížit o 3
+#  
+# **Je-li splněna normalita dat -> pravidlo 3σ**
+# σ:  P(µ − σ < X < µ + σ) = 0,6827
+# 2σ: P(µ − 2σ < X < µ + 2σ) = 0,9545
+# 3σ: P(µ − 3σ < X < µ + 3σ) = 0,9973
 # 
-# 2b. Poté vytvořte nový sloupec pokles_rel_dich, který bude obsahovat hodnotu "vetsi",
-# bude-li relativní pokles nad 10% a "mensi", bude-li relativní pokles menší nebo roven
-# 10%
+# **Není-li splněna normalita dat -> Čebyševova nerovnost**
+# σ:  P(µ − σ < X < µ + σ) = 0
+# 2σ: P(µ − 2σ < X < µ + 2σ) = 0,75
+# 3σ: P(µ − 3σ < X < µ + 3σ) = 0,8889
 
 
-dataS %>% 
-  mutate(pokles_rel=100*pokles/kap5)
+mu = mean(data_A_kap5_bezOP)
+sigma = sd(data_A_kap5_bezOP)
+paste0("<", mu - sigma, ", ", mu + sigma, ">")
+paste0("<", mu - 2*sigma, ", ", mu + 2*sigma, ">")
+paste0("<", mu - 3*sigma, ", ", mu + 3*sigma, ">")
 
-dataS %>% 
-  mutate(pokles_rel=100*pokles/kap5) %>% 
-  mutate(pokles_rel_dich=ifelse(pokles_rel>10,"vetsi","mensi"))
+#  10. Zaokrouhlování ####
+# vše potřebné k zaokrouhlování naleznete na LMS v dokumento zaokrouhlování.
+# https://lms.vsb.cz/pluginfile.php/1298954/mod_folder/content/0
+# /Leg%C3%A1ln%C3%AD%20tah%C3%A1ky/zaokrouhlovani.pdf 
+# To nejdůležitější:
+# - směrodatnou odchylku zaokrouhlujeme na předepsaný počet cifer nahoru (ceiling)
+#  - velikost datového souboru = <2,10> -> 1 platná cifra
+#  - velikost datového souboru = (10,30> -> 2 platné cifry
+#  - velikost datového souboru = (30,2000> -> 3 platné cifry
+# - míry polohy (průměry, kvantily, ...) pak zaokrouhlujeme klasicky (round) na stejnou
+# platnou cifru jako směrodatnou odchylku
+
+
+length(data_A_kap5_bezOP)
+smer_odch = sd(data_A_kap5_bezOP)
+smer_odch
+
+ceiling(smer_odch*10)/10
+
+prumer = mean(data_A_kap5_bezOP)
+prumer
+
+round(prumer,digits=1)
+
+max(data_A_kap5_bezOP)
 
 
 

@@ -9,5 +9,5 @@ install.packages("EnvStats")
 install.packages("binom")
 
 
-install.packages('IRkernel')
-IRkernel::installspec(user = TRUE)
+#install.packages('IRkernel')
+#IRkernel::installspec(user = TRUE)

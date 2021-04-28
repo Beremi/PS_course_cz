@@ -542,5 +542,62 @@ efekty$efekt = efekty$median_skup - median_vsech
 # vypsat setřízené
 efekty %>% arrange(desc(efekt))
 
+# * Příklad 6. (více skupin) ####
+# Co se Sněhurka dostala k sedmi trpaslíkům vycítila příležitost nemalého výdělku.
+# Trpaslíci Sněhurce v podstatě zobou z ruky a veškeré vydolované zlato jí ihned
+# předávají. Sněhurce však ani toto úplně nestačí a má pocit, že by mohla z trpaslíků
+# benefitovat více. Proto si začla zaznamenávat kolik kilogramů zlata denně od každého z
+# trpaslíků obdrží (snehurka.xlsx). Ověřte, zda se trpaslíci liší v množství vytěženého
+# zlata, pokud ano sestave homogenní skupiny z hlediska vytěženého zlata.
+
+
+zlato = readxl::read_excel("data/snehurka.xlsx")
+head(zlato)
+# data jsou ve standardním dtovém formátu
+
+boxplot(zlato$hodnota ~ zlato$typ)
+# data neobsahují OP
+
+# ověření normality
+library(dplyr)
+
+zlato %>% group_by(typ) %>%
+    summarize(p.hodnota = shapiro.test(hodnota)$p.value)
+
+# Na hladině významnosti 0,05 ne zamítáme předpoklad normality
+
+# Předpoklad normality nebyl zamítnut -> Bartlettův test
+bartlett.test(zlato$hodnota ~ zlato$typ) 
+
+# Na hladině významnosti 0,05 nelze zamítnout předpoklad o shodě rozptylů 
+
+# ANOVA
+vysledky = aov(zlato$hodnota ~ zlato$typ) 
+summary(vysledky)  
+# Zamítáme předpoklad o shodě
+# -> existují stat. významné rozdíly ve středních hodnotách
+
+# POST-HOC
+res = TukeyHSD(vysledky)[[1]]
+res
+
+# počítání efektů
+library(dplyr)
+
+# celkový průměr
+prumer_vsech = mean(zlato$hodnota)
+prumer_vsech
+
+# průměry ve skupinách
+efekty = zlato %>% group_by(typ) %>% 
+    summarize(mean_skup = mean(hodnota))
+
+# efekty
+efekty$efekt = efekty$mean_skup - prumer_vsech
+
+# vypsat setřízené
+efekty.s = efekty %>% arrange(desc(efekt))
+efekty.s
+
 
 

@@ -10,5 +10,8 @@ install.packages("binom")
 install.packages("car")
 install.packages("dunn.test")
 
+install.packages("lsr")
+install.packages("epiR")
+install.packages("nortest")
 #install.packages('IRkernel')
 #IRkernel::installspec(user = TRUE)

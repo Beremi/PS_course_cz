@@ -56,7 +56,7 @@ data
 data = read.csv2(file="aku.csv", sep=";", quote="", skip=0, header=TRUE)
 data
 
-help(read.csv2)
+#help(read.csv2)
 
 # Načtení a uložení datového souboru ve formátu csv2 z lokálního disku do datového rámce data
 data = read.csv2(file="./data/aku.csv")
@@ -376,7 +376,7 @@ data_DM_S=reshape(data=as.data.frame(data_DM),
                   timevar="vyrobce")
 head(data_DM_S)
 
-help(reshape)
+#help(reshape)
 
 # a pokud bychom chtěli, můžeme převést data zpět
 data_DM_2=reshape(data=data_DM_S,
@@ -821,24 +821,22 @@ data_A_kap5_bezOP
 
 head(data5S)
 
-pom = boxplot(data5S$kap5 ~ data5S$vyrobce)
-pom
+data5S$id = 1:length(data5S$kap5)
+head(data5S)
 
-# **Pozor, je to třeba udělat po jednotlivých kategoriích, jinak riskujeme smazání dat,
-# které do dat. souboru patří!!!**
+boxplot(data5S$kap5 ~ data5S$vyrobce)
 
+library(rstatix)
 
-vyrobci = unique(data5S$vyrobce) # c("A","B",..)
-vyrobci
+op_kap5 = 
+  data5S %>% 
+  group_by(vyrobce) %>% 
+  identify_outliers(kap5)
+op_kap5
 
-data5S_bezOP = data5S
+data5S$kap5_bez_OP = ifelse(data5S$id %in% op_kap5$id, NA, data5S$kap5) 
 
-for(vyrobce in vyrobci){
-    pom = boxplot(data5S$kap5[data5S$vyrobce == vyrobce],plot = FALSE)
-    data5S_bezOP$kap5[data5S$kap5 %in% pom$out & data5S$vyrobce == vyrobce]=NA
-}
-
-boxplot(data5S_bezOP$kap5 ~ data5S_bezOP$vyrobce)
+boxplot(data5S$kap5_bez_OP ~ data5S$vyrobce)
 
 # **Analytik může vždy říct, že odlehlá pozorování odstraňovat nebude, ale tuto
 # informaci musí do zápisu o analýze uvést!**
@@ -849,9 +847,11 @@ boxplot(data5S_bezOP$kap5 ~ data5S_bezOP$vyrobce)
 # **Vycházíme z dat po odstranění odlehlých pozorování:**
 
 
+data_A_kap5_bezOP = as.list(data5S %>% filter(vyrobce=="A") %>% select(kap5_bez_OP))
+head(data_A_kap5_bezOP)
+
 # použijeme data z ukázky odstranění op
 data_A_kap5_bezOP = na.omit(data_A_kap5_bezOP)
-data_A_kap5_bezOP
 
 # Vykreslíme QQ graf a spočteme šikmost a špičatost:
 
@@ -859,8 +859,8 @@ data_A_kap5_bezOP
 qqnorm(data_A_kap5_bezOP)
 qqline(data_A_kap5_bezOP)
 
-skewness(data_A_kap5_bezOP)
-kurtosis(data_A_kap5_bezOP) - 3 # jiná definice posunutá o 3
+moments::skewness(data_A_kap5_bezOP)
+moments::kurtosis(data_A_kap5_bezOP) - 3 # jiná definice posunutá o 3
 
 # - tečky v QQ grafu musí ležet přibližně na čáře - tzn. kvantily odpovídají přibližně
 # kvantilům normálního rozdělení

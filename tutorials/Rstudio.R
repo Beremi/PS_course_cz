@@ -5,7 +5,7 @@
 # Pro spouštění příkazů v jednotlivých řádcích použijte CTRL+ENTER
 
 # * Instalace balíčků ####
-# Balíčky stačí vždy instalovat pouze jednou a pak budou k dispozici pro všechny 
+# Balíčky stačí vždy instalovat pouze jednou a pak budou k dispozici pro všechny
 # aplikace používající dané Rko
 
 # install.packages('readxl')
@@ -22,7 +22,7 @@ getwd()
 # setwd('cesta k aktuálnímu souboru')
 # pomocí 'More' v prohlížeči souborů
 
-data = read.csv2(file="./data/aku.csv")
+data <- read.csv2(file = "./data/aku.csv")
 
 # načítání lze dělat pomoci GUI
 # File->Import Dataset (readr pro csv, Excel)
@@ -40,10 +40,9 @@ boxplot(data)
 # * Zastavení aktuálního výpočtu, restart kernelu ####
 # Session->Interupt R
 # Session->Restart R
-a = 1
-while(5>3)
-{
-  a = a + 1
+a <- 1
+while (5 > 3) {
+  a <- a + 1
 }
 a
 

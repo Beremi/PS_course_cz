@@ -9,7 +9,8 @@
                 "mhutchie.git-graph",
                 "oderwat.indent-rainbow",
                 "visualstudioexptteam.vscodeintellicode",
-                "grapecity.gc-excelviewer"
+                "grapecity.gc-excelviewer",
+                "tomoki1207.pdf"
             ]
         },
         "codespaces": {

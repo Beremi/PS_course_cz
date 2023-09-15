@@ -1,8 +1,13 @@
 {
     "name": "R & Jupyter Environment",
-    "dockerFile": "Dockerfile",
-    "forwardPorts": [
-        8888
+    "image": "mcr.microsoft.com/devcontainers/universal:2",
+    "waitFor": "onCreateCommand",
+    "postCreateCommand": [
+        "apt-get update",
+        "apt-get install -y r-base r-base-dev python3-pip libcurl4-openssl-dev libssl-dev",
+        "R -e \"install.packages(c('IRkernel', 'repr', 'IRdisplay', 'evaluate', 'crayon', 'pbdZMQ', 'devtools', 'uuid', 'digest', 'languageserver'))\"",
+        "pip3 install jupyter",
+        "R -e \"IRkernel::installspec(user = TRUE)\""
     ],
     "customizations": {
         "vscode": {
@@ -15,6 +20,5 @@
         "codespaces": {
             // "openFiles": [""]
         }
-    },
-    "postCreateCommand": "echo 'Environment Ready!'"
+    }
 }

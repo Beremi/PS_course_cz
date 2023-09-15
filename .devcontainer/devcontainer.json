@@ -8,7 +8,8 @@
                 "reditorsupport.r",
                 "mhutchie.git-graph",
                 "oderwat.indent-rainbow",
-                "visualstudioexptteam.vscodeintellicode"
+                "visualstudioexptteam.vscodeintellicode",
+                "grapecity.gc-excelviewer"
             ]
         },
         "codespaces": {

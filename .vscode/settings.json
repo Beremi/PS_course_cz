@@ -7,4 +7,5 @@
     },
     "notebook.lineNumbers": "on",
     "editor.inlineSuggest.enabled": true,
+    "workbench.colorTheme": "Default Dark Modern",
 }

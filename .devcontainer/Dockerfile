@@ -7,6 +7,11 @@ RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
     libssl-dev \
     libzmq5 \
+    git\
+    udunits2 \
+    udunits2-devel \
+    libproj-dev \
+    libgdal-dev \
     libzmq5-dev
 
 # Install Jupyter first
@@ -16,7 +21,7 @@ RUN pip3 install jupyter
 ENV PATH=$PATH:/root/.local/bin/
 
 # Install Jupyter and IRKernel
-RUN R -e "install.packages(c('IRkernel', 'repr', 'IRdisplay', 'evaluate', 'crayon', 'pbdZMQ', 'devtools', 'uuid', 'digest', 'languageserver', 'binom', 'BSDA', 'car', 'dplyr', 'dunn.test', 'EnvStats', 'epiR', 'FSA', 'lawstat', 'lsr', 'moments', 'nortest', 'openxlsx', 'rcompanion', 'readxl', 'robustbase', 'stringi', 'rstatix', 'ggplot2', 'ggmosaic', 'tidyr'))"
+RUN R -e "install.packages(c('IRkernel', 'repr', 'IRdisplay', 'evaluate', 'crayon', 'pbdZMQ', 'devtools', 'uuid', 'digest', 'languageserver', 'binom', 'BSDA', 'car', 'dplyr', 'dunn.test', 'EnvStats', 'survival', 'units', 'epiR', 'FSA', 'lawstat', 'lsr', 'moments', 'nortest', 'openxlsx', 'rcompanion', 'readxl', 'robustbase', 'stringi', 'rstatix', 'ggplot2', 'ggmosaic', 'tidyr'))"
 RUN R -e "IRkernel::installspec(user = TRUE)"
 
 # Expose Jupyter port

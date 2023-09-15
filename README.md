@@ -1,5 +1,5 @@
 # Pravděpodobnost a statistika ZS 2023/2024
 <!-- badges: start -->
-[![Launch Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/Beremi/PS_env/main?urlpath=git-pull%3Frepo%3Dhttps%253A%252F%252Fgithub.com%252FBeremi%252FPS_2021%26urlpath%3Dlab%252Ftree%252FPS_2021%252F%26branch%3Dmain)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Beremi/PS_course_cz?quickstart=1)
 <!-- badges: end -->
 **Materiály pro cvičení (vyučující Michal Béreš).**

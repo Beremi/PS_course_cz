@@ -8,8 +8,8 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     libzmq5 \
     git\
-    udunits2 \
-    udunits2-devel \
+    libudunits2 \
+    libudunits2-dev \
     libproj-dev \
     libgdal-dev \
     libzmq5-dev

@@ -1,0 +1,20 @@
+{
+    "name": "R & Jupyter Environment",
+    "dockerFile": "Dockerfile",
+    "forwardPorts": [
+        8888
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-toolsai.jupyter",
+                "reditorsupport.r"
+            ]
+        },
+        "codespaces": {
+            // "openFiles": [""]
+        }
+    },
+    "postCreateCommand": "echo 'Environment Ready!'"
+}

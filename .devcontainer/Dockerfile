@@ -9,13 +9,17 @@ RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
     libssl-dev \
     libzmq5 \
-    git\
+    git \
     libudunits2-0 \
     libudunits2-dev \
     libproj-dev \
     libgdal-dev \
     libzmq5-dev
 
+# Create a new user named rstudio_user
+# RUN adduser --disabled-password --gecos "" rstudio_user
+
+# Install R packages
 RUN install2.r --error --skipinstalled -n -1 \
     statip \
     patchwork \
@@ -58,4 +62,13 @@ RUN install2.r --error --skipinstalled -n -1 \
     tidyr \
     && rm -rf /tmp/downloaded_packages
 
-RUN echo "auth-none=1\nauth-minimum-user-id=000" >> /etc/rstudio/rserver.conf
+# Adjust RStudio Server configuration
+#RUN echo "auth-none=1" >> /etc/rstudio/rserver.conf \
+#    && echo "auth-minimum-user-id=1000" >> /etc/rstudio/rserver.conf
+
+# Set the USER environment variable for RStudio Server to recognize
+#ENV USER=rstudio_user
+# Set default working directory for rstudio_user in RStudio Server
+#RUN echo "initial-working-directory=/workspaces/PS_course_cz" >> /home/rstudio_user/.rstudio/rsession.conf
+#    && chown rstudio_user:rstudio_user /home/rstudio_user/.rstudio/rsession.conf
+

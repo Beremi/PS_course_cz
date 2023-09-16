@@ -58,4 +58,4 @@ RUN install2.r --error --skipinstalled -n -1 \
     tidyr \
     && rm -rf /tmp/downloaded_packages
 
-RUN echo -e "auth-none=1\nauth-minimum-user-id=500" >> /etc/rstudio/rserver.conf
+RUN echo "auth-none=1\nauth-minimum-user-id=000" >> /etc/rstudio/rserver.conf

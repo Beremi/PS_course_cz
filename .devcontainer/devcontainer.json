@@ -10,7 +10,8 @@
                 "oderwat.indent-rainbow",
                 "visualstudioexptteam.vscodeintellicode",
                 "grapecity.gc-excelviewer",
-                "tomoki1207.pdf"
+                "tomoki1207.pdf",
+                "ms-toolsai.jupyter-keymap"
             ]
         },
         "codespaces": {

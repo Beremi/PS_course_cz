@@ -1,4 +1,4 @@
-# Pravděpodobnost a statistika ZS 2023/2024
+# Pravděpodobnost a statistika LS 2023/2024
 
 **Materiály pro cvičení (vyučující Michal Béreš).**
 

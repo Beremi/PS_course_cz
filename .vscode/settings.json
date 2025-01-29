@@ -7,7 +7,7 @@
     },
     "notebook.lineNumbers": "on",
     "editor.inlineSuggest.enabled": true,
-    "workbench.colorTheme": "Default Dark Modern",
+    "workbench.colorTheme": "Default Light Modern",
     "workbench.editorAssociations": {
         "*.xlsx": "gc-excelviewer-excel-editor",
         "*.csv": "gc-excelviewer-csv-editor"

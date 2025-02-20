@@ -7,8 +7,8 @@
 # Pro zobrazení obsahu skriptu použijte CTRL+SHIFT+O
 # Pro spouštění příkazů v jednotlivých řádcích použijte CTRL+ENTER
 
-#  Přehled testů/konstrukcí IO ####
-# * Párová vs. dvouvýběrová data ####
+#
+#  1. Párová vs. dvouvýběrová data ####
 # - Párová data označují data, která jsou vstažena k dvěma měřením stejných entit ->
 # datové sloupce jsou závislé.
 # - Pokud jsou nezávislé, jedná se o dvouvýběrový test.
@@ -27,7 +27,7 @@
 # -> dvě nezávislé skupiny -> dvouvýběrové testy
 
 
-# * Obecně k dvouvýběrovým testům/IO ####
+# ** Obecně k dvouvýběrovým testům/IO ####
 # - test je vždy svázán s příslušným IO -> stejné podmínky pro použití
 # - pokud má test podmínky použití (např.: normalita dat, symetrie dat) pak musí tuto
 # podmínku splnit **oba soubory**, pokud alespoň jeden nesplňuje, považujeme předpoklad
@@ -37,7 +37,13 @@
 # předpokládat, že výrobky výrobce A jsou samostatné entity od výrobků výrobce B
 
 
-# * Dvouvýběrové testy/IO - rozdíl měr polohy ####
+# ---
+
+
+#  2. Přehled testů/konstrukcí IO ####
+
+
+# * I. Dvouvýběrové testy/IO - rozdíl měr polohy ####
 
 
 # vyrobíme si testovací data - tak je lze použít všude
@@ -46,7 +52,7 @@ data2 <- rnorm(n = 30, mean = 100, sd = 10)
 boxplot(data1, data2)
 
 
-# ** Dvouvýběrový Studentův t-test ####
+# ** a) Dvouvýběrový Studentův t-test ####
 # - Testuje/odhaduje rozdíl středních hodnot: $H_0: \mu_{1} - \mu_{2} = a$
 # - požadavky:
 #     - Normalita dat
@@ -82,7 +88,7 @@ t.test(
 )
 
 
-# ** Aspinové-Welshův test ####
+# ** b) Aspinové-Welshův test ####
 # - Testuje/odhaduje rozdíl středních hodnot: $H_0: \mu_{1} - \mu_{2} = a$
 # - požadavky:
 #     - Normalita dat
@@ -117,7 +123,7 @@ t.test(
 )
 
 
-# ** Mannův-Whitneyův test ####
+# ** c) Mannův-Whitneyův test ####
 # - Testuje/odhaduje rozdíl mediánů: $H_0: X_{0.5,1} - X_{0.5,2} = a$
 # - požadavky:
 #     - nezávislost výběrů
@@ -152,8 +158,8 @@ wilcox.test(
 )
 
 
-# * Dvouvýběrové testy/IO - podíl rozptylů ####
-# ** F-test ####
+# * II. Dvouvýběrové testy/IO - podíl rozptylů ####
+# ** a) F-test ####
 # - Testuje/odhaduje podíl rozptylů: $H_0: \sigma^2_{1} / \sigma^2_{2} = a$
 # - požadavky:
 #     - normalita dat
@@ -187,7 +193,7 @@ var.test(
 )
 
 
-# ** Leveneův test ####
+# ** b) Leveneův test ####
 # - Testuje rovnost rozptylů: $H_0: \sigma^2_{1} = \sigma^2_{2}$ !
 # - požadavky:
 #     - nezávislost výběrů
@@ -219,7 +225,7 @@ head(data)
 car::leveneTest(data$data ~ data$typ)
 
 
-# * Dvouvýběrové testy/IO - rozdíl pravděpodobností ####
+# * III. Dvouvýběrové testy/IO - rozdíl pravděpodobností ####
 # ** Test homogenity dvou binomických rozdělení ####
 # - Testuje shodu/odhaduje rozdíl pravděpodobností: $H_0: \pi_{1} - \pi_{2} = 0$
 # - požadavky:
@@ -273,12 +279,15 @@ prop.test(
 )
 
 
+# ---
+
+
 #  Příklady ####
 # * Příkald 1. ####
-# Data v souboru cholesterol2.xls udávají hladinu cholesterolu v krvi mužů dvou různých
-# věkových skupin (20-30 letých a 40-50 letých). Ověřte na hladině významnosti 0,05
-# hypotézu, zda se hladina cholesterolu v krvi starších mužů neliší od hladiny
-# cholesterolu v krvi mladších mužů.
+# Data v souboru `data/testy_dvouvyberove.xlsx` v listu `cholesterol2` udávají hladinu
+# cholesterolu v krvi mužů dvou různých věkových skupin (20-30 letých a 40-50 letých).
+# Ověřte na hladině významnosti 0,05 hypotézu, zda se hladina cholesterolu v krvi
+# starších mužů neliší od hladiny cholesterolu v krvi mladších mužů.
 
 
 # Načtení dat
@@ -297,7 +306,7 @@ colnames(chol.s) <- c("hodnoty", "skupina")
 head(chol.s)
 
 
-# Explorační analýza
+# Explorační analýza - zhodnocení OP
 boxplot(chol.s$hodnoty ~ chol.s$skupina)
 
 

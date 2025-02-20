@@ -1,6 +1,6 @@
 # ......................................................................................
 # .........................Cvičení 4 - Spojitá náhodná veličina.........................
-# ..................Martina Litschmannová, Adéla Vrtková, Michal Béreš..................
+# ..................Michal Béreš, Martina Litschmannová, Adéla Vrtková..................
 # ......................................................................................
 
 # Nezobrazuje-li se vám text korektně, nastavte File \ Reopen with Encoding... na UTF-8
@@ -26,7 +26,9 @@ b <- 2
 integrate(f, a, b)
 
 
-#  Příklady ####
+# ---
+#  Příklady k procvičení ####
+# ---
 # * Příklad 1. ####
 # Náhodná veličina X má distribuční funkci
 # $F(x)=\begin{cases}
@@ -37,29 +39,8 @@ integrate(f, a, b)
 # Jaké hodnoty může nabývat konstanta c?
 
 
-# derovací F(x) získáme hustotu pravd. f(x)
-# příslušná hustota pravděpodobnosti na intrvalu <0,1>
-f <- function(x) {
-    return(2 * x)
-} # f(x) = 2x
-a <- 0
-b <- 1
-integrate(f, a, b)$value
-
-
-# c = 1, proto distribuční funkce vypadá takto:
-F.dist <- function(x) {
-    res <- x * x # x^2
-    res[x <= 0] <- 0 # 0 pro x<=0
-    res[x > 1] <- 1 # 1 pro x>1
-    return(res)
-}
-
-
-x <- seq(from = -1, to = 2, by = 0.01) # body na ose x
-FX <- F.dist(x) # hodnoty F(x)
-plot(x, FX, type = "l") # vykreslit jako čáru
-
+# c = 1, ze spojitosti F(x)
+# cx^2 = 1 pro x = 1
 
 # * Příklad 2. ####
 # Rozdělení náhodné veličiny X je dáno hustotou
@@ -68,22 +49,9 @@ plot(x, FX, type = "l") # vykreslit jako čáru
 # 0    & x \notin <-1;0>
 # \end{cases}$
 # Určete:
-# ** 2. a) ####
+#
+# **2. a)**
 # $F(x)$,
-
-
-f.dens <- function(x) {
-    res <- 2 * x + 2
-    # pozor na x<-1 protože '<-' je v rku přiřazení
-    res[x < -1] <- 0 # 0 pro x<=0
-    res[x > 0] <- 0 # 1 pro x>1
-    return(res)
-}
-
-
-x <- seq(from = -2, to = 1, by = 0.01) # body na ose x
-fx <- f.dens(x) # hodnoty f(x)
-plot(x, fx, cex = 0.2) # vykreslit tečky (cex je velikost)
 
 
 F.dist <- function(x) {
@@ -99,9 +67,17 @@ FX <- F.dist(x) # hodnoty f(x)
 plot(x, FX, type = "l") # vykreslit tečky (cex je velikost)
 
 
-# ** 2. b) ####
-# P(−2 ≤ X ≤ −0.5), P(−2 ≤ X ≤ −1), P(X > 0.5), P(X = 0.3)
+# **2. b)**
+# $P(−2 ≤ X ≤ −0.5), P(−2 ≤ X ≤ −1), P(X > 0.5), P(X = 0.3)$
 
+
+f.dens <- function(x) {
+    res <- 2 * x + 2
+    # pozor na x<-1 protože '<-' je v rku přiřazení
+    res[x < -1] <- 0 # 0 pro x<=0
+    res[x > 0] <- 0 # 1 pro x>1
+    return(res)
+}
 
 # P(−2 ≤ X ≤ −0.5)
 integrate(f.dens, -2, -0.5)$value
@@ -113,7 +89,7 @@ integrate(f.dens, -2, -1)$value
 
 
 # P(X > 0.5)
-integrate(f.dens, 0.5, 1e16)$value # tohle nebude vždy fungovat
+integrate(f.dens, 0.5, 100)$value # tohle nebude vždy fungovat
 
 
 # P(X = 0.3)
@@ -122,7 +98,7 @@ integrate(f.dens, 0.3, 0.3)$value
 # odpovídá integrálu s a=b tedy s nulovou velikostí na ose x
 
 
-# ** 2. c) ####
+# **2. c)**
 # střední hodnotu, rozptyl a směrodatnou odchylku náhodné veličiny X.
 
 
@@ -134,7 +110,6 @@ x_fx <- function(x) {
 # integrujeme jen tam kde víme, že je f(x) nenulová
 E_X <- integrate(x_fx, -1, 0)$value
 E_X
--1 / 3
 
 
 # E(X^2)
@@ -145,29 +120,26 @@ xx_fx <- function(x) {
 # integrujeme jen tam kde víme, že je f(x) nenulová
 E_XX <- integrate(xx_fx, -1, 0)$value
 E_XX
-1 / 6
 
 
 # D(X)
 D_X <- E_XX - E_X^2
 D_X
-1 / 18
 
 
 # sigma(x)
 std_X <- sqrt(D_X)
 std_X
-sqrt(2) / 6
 
 
-# ** 2. d) ####
+# **2. d)**
 # modus $\hat{x}$
 
 
 # modus = 0
 
 
-# ** 2. e) ####
+# **2. e)**
 # medián $x_{0,5}$
 
 
@@ -177,15 +149,13 @@ plot(x, FX, type = "l")
 lines(c(-2, 1), c(0.5, 0.5))
 
 
-x[FX >= 0.5][1] # první prvek z x pro který F(x)>=0.5
-(-2 + sqrt(2)) / 2
-
-
 # * Příklad 3. ####
-# Náhodná veličina Y je definována jako: Y = 3X+1, kde X je náhodná veličina z
+# Náhodná veličina $Y$ je definována jako: $Y = 3X+1$, kde $X$ je náhodná veličina z
 # předcházejícího
 # příkladu. Určete:
-# ** 3. a) ####
+#
+#
+# **3. a)**
 # $F_Y(y)$
 
 
@@ -200,7 +170,7 @@ FY <- FY.dist(y)
 plot(y, FY, type = "l")
 
 
-# ** 3. b) ####
+# **3. b)**
 # $f_Y(y)$
 
 
@@ -217,8 +187,8 @@ fY <- fY.dens(y)
 plot(y, fY, cex = 0.2)
 
 
-# ** 3. c) ####
-# E(Y), D(Y), σ(Y)
+# **3. c)**
+# $E(Y), D(Y), \sigma(Y)$
 
 
 # E(Y)
@@ -264,8 +234,8 @@ sqrt(D_Y)
 sqrt(2) / 2
 
 
-# * Příklad 4. (není ze sbírky) ####
-# Spočtěte $\omega$ takové, aby náhodná veličina X s hustotou pravděpodobnosti:
+# * Příklad 4. ####
+# Spočtěte $\omega$ takové, aby náhodná veličina $X$ s hustotou pravděpodobnosti:
 # $f(x)=\begin{cases}
 # 0 & x < 0 \\
 # 3e^{-3x}    & x \geq 0

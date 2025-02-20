@@ -69,7 +69,7 @@ car::leveneTest(data$hodnota ~ data$typ)
 # - požadují normalitu dat a tzv. vyvážené třízení
 #     - vyvážené třízení znamená, že máme přibližně stejné množství dat v každé skupině
 # - nebudeme je používat
-#
+# 
 # * Míry polohy ####
 # ** ANOVA (analýza rozptylu) ####
 # - ověřuje shodu polohy (středních hodnot)
@@ -288,8 +288,8 @@ kysel.s %>%
 
 # Ověření shody rozptylů
 s2 <- kysel.s %>%
-    group_by(skupina) %>%
-    summarise(var = sd(hodnoty)^2)
+        group_by(skupina) %>%
+        summarise(var = sd(hodnoty)^2)
 s2 # výběrové rozptyly
 
 max(s2$var) / min(s2$var)
@@ -405,8 +405,8 @@ kralici.s %>%
 
 # Ověření shody rozptylů
 s2 <- kralici.s %>%
-    group_by(skupina) %>%
-    summarize(var = sd(hodnoty.bez, na.rm = TRUE)^2)
+        group_by(skupina) %>%
+        summarize(var = sd(hodnoty.bez, na.rm = TRUE)^2)
 s2
 
 max(s2$var) / min(s2$var)
@@ -567,8 +567,8 @@ trombin.s %>%
 
 # Ověření shody rozptylů (není nutné - stejně musíme použít KW)
 s2 <- trombin.s %>%
-    group_by(skupina) %>%
-    summarize(var = sd(hodnoty)^2)
+        group_by(skupina) %>%
+        summarize(var = sd(hodnoty)^2)
 s2
 
 max(s2$var) / min(s2$var)
@@ -587,11 +587,11 @@ car::leveneTest(trombin.s$hodnoty ~ trombin.s$skupina)
 
 # Ověření symetrie
 trombin.s %>%
-    group_by(skupina) %>%
-    summarize(
-        sikmost = moments::skewness(hodnoty),
-        test.pval = lawstat::symmetry.test(hodnoty, boot = FALSE)$p.value
-    )
+  group_by(skupina) %>%
+  summarize(
+    sikmost = moments::skewness(hodnoty),
+    test.pval = lawstat::symmetry.test(hodnoty, boot = FALSE)$p.value
+  )
 # nezamítáme přepoklad symetrie dat
 
 
@@ -696,3 +696,5 @@ efekty$efekt <- efekty$mean_skup - prumer_vsech
 # vypsat setřízené
 efekty.s <- efekty %>% arrange(desc(efekt))
 efekty.s
+
+

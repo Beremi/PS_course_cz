@@ -7,8 +7,7 @@
 # Pro zobrazení obsahu skriptu použijte CTRL+SHIFT+O
 # Pro spouštění příkazů v jednotlivých řádcích použijte CTRL+ENTER
 
-#  Přehled rozdělení a jejich funkcí ####
-# * Úvod: Hustota pravděpodobnosti, Distribuční funkce a Kvantilová funkce ####
+#  Přehled typů R-kových funkcí (prefix ve jménech funkcí) ####
 # ** Hustota pravděpodobnosti ####
 # - začíná písmenkem **d**: p = d...(x, ...)
 #
@@ -18,12 +17,21 @@
 # ** Kvantilová funkce ####
 # - začíná písmenkem **q**:  najdi x pro zadané p: $p = F(x) \rightarrow x = F^{-1}(p)$:
 # x = q...(p, ...)
+# ---
 
 
-# * Rovnoměrné rozdělení: $X \sim Ro(a, b)$ ####
-# - náhodná veličina nabývá pouze hodnot větších než a a menších než b
+#  Přehled rozdělení (sufix ve jménech funkcí) ####
+# ** Rovnoměrné rozdělení: $$X \sim Ro(a, b)$$ ####
+# - náhodná veličina nabývá pouze hodnot větších než $a$ a menších než $b$
 # - všechny hodnoty mají stejnou hustotu výskytu -> hustota pravděpodobnosti je
-# konstantní mezi a a b, jinde nulová
+# konstantní mezi $a$ a $b$, jinde nulová
+#
+# $$f(x) = \begin{cases} \frac{1}{b-a} & \text{pro } x \in (a, b) \\ 0 & \text{jinak}
+# \end{cases}$$
+# $$F(x) = \begin{cases} 0 & \text{pro } x \leq a \\ \frac{x-a}{b-a} & \text{pro } x \in
+# (a, b) \\ 1 & \text{pro } x \geq b \end{cases}$$
+# $$E(X) = \frac{a+b}{2}$$
+# $$D(X) = \frac{(b-a)^2}{12}$$
 
 
 # Hustota pravděpodobnosti f(x)
@@ -33,26 +41,20 @@ x <- 3
 dunif(x, a, b)
 
 
+# Distribuční funkce F(x) = P(X < x)
+punif(x, a, b)
+
+
 # vykreslíme si Hustotu pravděpodobnosti
 x <- seq(from = 0, to = 6, by = 0.01)
 f_x <- dunif(x, a, b)
 plot(x, f_x, cex = 0.1) # cex je velikost markerů
 grid()
 
-
-# Distribuční funkce F(x) = P(X < x)
-a <- 2 # odkud
-b <- 4 # kam
-x <- 3
-punif(x, a, b)
-
-
 # vykreslíme si Distribuční funkci
-x <- seq(from = 0, to = 6, by = 0.01)
 F_x <- punif(x, a, b)
 plot(x, F_x, type = "l")
 grid()
-
 
 # kvantilová funkce F^(-1)(p) = x: P(X<x)=p
 a <- 2 # odkud
@@ -61,18 +63,18 @@ p <- 0.75
 qunif(p, a, b)
 
 
-# vykreslení - kvantilová funkce F^(-1)(p) = x
-p <- seq(from = 0, to = 1, by = 0.01)
-x <- qunif(p, a, b)
-plot(p, x, type = "l")
-grid()
-
-
-# * Exponenciální rozdělení: $X \sim Exp(\lambda)$ ####
+# ** Exponenciální rozdělení: $$X \sim Exp(\lambda)$$ ####
 # - doba do 1. události, doba mezi událostmi (pouze v období stabilního života -
 # Poissonův proces)
 # - parametr $\lambda$ je tentýž co v Poissonově rozdělení
 # - střední hodnota je: $E(X)=1 / \lambda$
+#
+# $$f(x) = \begin{cases} \lambda e^{-\lambda x} & \text{pro } x \geq 0 \\ 0 &
+# \text{jinak} \end{cases}$$
+# $$F(x) = \begin{cases} 1 - e^{-\lambda x} & \text{pro } x \geq 0 \\ 0 & \text{jinak}
+# \end{cases}$$
+# $$E(X) = \frac{1}{\lambda}$$
+# $$D(X) = \frac{1}{\lambda^2}$$
 
 
 # Hustota pravděpodobnosti f(x)
@@ -81,25 +83,20 @@ x <- 1
 dexp(x, lambda)
 
 
-# vykreslíme si Hustotu pravděpodobnosti
-x <- seq(from = 0, to = 6, by = 0.01)
-f_x <- dexp(x, lambda)
-plot(x, f_x, type = "l")
-grid()
-
-
 # Distribuční funkce F(x) = P(X < x)
-lambda <- 2
-x <- 1
 pexp(x, lambda)
 
 
+# vykreslíme si Hustotu pravděpodobnosti
+x <- seq(from = -1, to = 6, by = 0.001)
+f_x <- dexp(x, lambda)
+plot(x, f_x, cex = 0.1)
+grid()
+
 # vykreslíme si Distribuční funkci
-x <- seq(from = 0, to = 6, by = 0.01)
 F_x <- pexp(x, lambda)
 plot(x, F_x, type = "l")
 grid()
-
 
 # kvantilová funkce F^(-1)(p) = x: P(X<x)=p
 lambda <- 2
@@ -107,68 +104,44 @@ p <- 0.5
 qexp(p, a, b)
 
 
-# vykreslení - kvantilová funkce F^(-1)(p) = x
-p <- seq(from = 0, to = 1, by = 0.001)
-x <- qexp(p, lambda)
-plot(p, x, type = "l")
-grid()
-
-
-# * Weibullovo rozdělení: $X \sim W(\theta,\beta)$ ####
-# - doba do 1. události (poruchy)(vhodná volba β umožuje použití v libovolném období
-# intenzity poruch)
-# - rozšíření exponenciálního rozdělení Exp(λ) = W(Θ=1/λ, β=1)
+# ** Weibullovo rozdělení: $$X \sim W(\theta,\beta)$$ ####
+# - doba do 1. události (poruchy)(vhodná volba $\beta$ umožuje použití v libovolném
+# období intenzity poruch)
+# - rozšíření exponenciálního rozdělení $$Exp(\lambda) = W(\theta=\frac{1}{\lambda},
+# \beta=1)$$
 
 
 # Hustota pravděpodobnosti f(x)
-theta <- 1 / 2 # ekvivalent 1/lambda u exp. rozdělení
-beta <- 1 # beta = 1 -> exponenciální rozdělení
+theta <- 3 # ekvivalent 1/lambda u exp. rozdělení
+beta <- 2 # beta = 1 -> exponenciální rozdělení
 x <- 5
 dweibull(x, shape = beta, scale = theta)
 
 
-# vykreslíme si Hustotu pravděpodobnosti
-x <- seq(from = 0, to = 6, by = 0.01)
-f_x <- dweibull(x, shape = beta, scale = theta)
-plot(x, f_x, type = "l")
-grid()
-
-
 # Distribuční funkce F(x) = P(X < x)
-theta <- 3 # ekvivalent 1/lambda u exp. rozdělení
-beta <- 2 # beta = 1 -> exponenciální rozdělení
-x <- 5
 pweibull(x, shape = beta, scale = theta)
 
 
+# vykreslíme si Hustotu pravděpodobnosti
+x <- seq(from = -1, to = 10, by = 0.001)
+f_x <- dweibull(x, shape = beta, scale = theta)
+plot(x, f_x, cex = 0.1)
+grid()
+
 # vykreslíme si Distribuční funkci
-x <- seq(from = 0, to = 6, by = 0.01)
 F_x <- pweibull(x, shape = beta, scale = theta)
 plot(x, F_x, type = "l")
 grid()
 
-
-# kvantilová funkce F^(-1)(p) = x: P(X<x)=p
-theta <- 3 # ekvivalent 1/lambda u exp. rozdělení
-beta <- 2 # beta = 1 -> exponenciální rozdělení
-p <- 0.5
-qweibull(p, shape = beta, scale = theta)
-
-
-# vykreslení - kvantilová funkce F^(-1)(p) = x
-p <- seq(from = 0, to = 1, by = 0.01)
-x <- qweibull(p, shape = beta, scale = theta)
-plot(p, x, type = "l")
-grid()
-
-
-# * Normální rozdělení: $X \sim N(\mu,\sigma^2)$ ####
+# ** Normální rozdělení: $$X \sim N(\mu,\sigma^2)$$ ####
 # - rozdělení modelující např. chyby měření, chování součtu/průměru mnoha jiných
 # náhodných veličin
 # - viz. Centrální limitní věta
-# - $\mu$ je přímo střední hodnota rozdělení: $E(X)=\mu$
-# - $\sigma$ je přímo směrodatná odchyla rozdělení: $D(X)=\sigma^2$
+# - $\mu$ je přímo střední hodnota rozdělení: $$E(X)=\mu$$
+# - $\sigma$ je přímo směrodatná odchyla rozdělení: $$D(X)=\sigma^2$$
 # - s parametry $\mu=0,\sigma=1$ se nazývá normované Normální rozdělení
+#
+# $$f(x) = \frac{1}{\sqrt{2\pi}\sigma} e^{-\frac{(x-\mu)^2}{2\sigma^2}}$$
 
 
 # Hustota pravděpodobnosti f(x)
@@ -178,22 +151,17 @@ x <- 4
 dnorm(x, mean = mu, sd = sigma)
 
 
+# Distribuční funkce F(x) = P(X < x)
+pnorm(x, mean = mu, sd = sigma)
+
+
 # vykreslíme si Hustotu pravděpodobnosti
-x <- seq(from = -5, to = 10, by = 0.01)
+x <- seq(from = -10, to = 15, by = 0.01)
 f_x <- dnorm(x, mean = mu, sd = sigma)
 plot(x, f_x, type = "l")
 grid()
 
-
-# Distribuční funkce F(x) = P(X < x)
-mu <- 2
-sigma <- 3
-x <- 4
-pnorm(x, mean = mu, sd = sigma)
-
-
 # vykreslíme si Distribuční funkci
-x <- seq(from = -5, to = 10, by = 0.01)
 F_x <- pnorm(x, mean = mu, sd = sigma)
 plot(x, F_x, type = "l")
 grid()
@@ -206,14 +174,9 @@ p <- 0.5
 qnorm(p, mean = mu, sd = sigma)
 
 
-# vykreslení - kvantilová funkce F^(-1)(p) = x
-p <- seq(from = 0, to = 1, by = 0.01)
-x <- qnorm(p, mean = mu, sd = sigma)
-plot(p, x, type = "l")
-grid()
-
-
-#  Příklady ####
+# ---
+#  Příklady k procvičení ####
+# ---
 
 
 # * Příklad 1. ####
@@ -244,7 +207,7 @@ pnorm(93, mean = mu, sd = sigma)
 lambda <- 1 / 30000
 
 
-# ** a) ####
+# **a)**
 # pravděpodobnost, že součástka nevydrží více než 2 000 hodin,
 
 
@@ -252,7 +215,7 @@ lambda <- 1 / 30000
 pexp(2000, lambda)
 
 
-# ** b) ####
+# **b)**
 # pravděpodobnost, že součástka vydrží více než 35 000 hodin,
 
 
@@ -260,7 +223,7 @@ pexp(2000, lambda)
 1 - pexp(35000, lambda)
 
 
-# ** c) ####
+# **c)**
 #  dobu, do níž se porouchá 95 % součástek.
 
 
@@ -312,8 +275,9 @@ p <- pp
 # Ve velké počítačové síti se průměrně přihlašuje 25 uživatelů za hodinu. Určete
 # pravděpodobnost,
 # že:
-# ** a)  ####
-# se nikdo nepřihlásí během 14:30 - 14:36,
+#
+#
+# **a)** se nikdo nepřihlásí během 14:30 - 14:36,
 
 
 # X … počet uživatelů přihlášených za 6 minut
@@ -327,7 +291,7 @@ lt <- lambda * t
 dpois(0, lt)
 
 
-# ** b)  ####
+# **b)**
 # do dalšího přihlášení uběhnou 2-3 minuty.
 
 
@@ -339,7 +303,7 @@ lambda <- 25 / 60
 pexp(3, lambda) - pexp(2, lambda)
 
 
-# ** c) ####
+# **c)**
 # Určete maximální délku časového intervalu tak, aby pravděpodobnost, že se nikdo
 # nepřihlásí byla alespoň 0,90.
 
@@ -350,39 +314,34 @@ qexp(0.10, lambda) * 60
 
 
 # * Příklad 6. ####
-# Náhodná veličina X má normální rozdělení N(µ; σ). Určete:
-# ** a) ####
-# P(µ − 2σ < X < µ + 2σ),
+# Náhodná veličina X má normální rozdělení $N(\mu; \sigma^2)$. Určete:
+#
+#
+# **a)**
+# $P(\mu − 2\sigma < X < \mu + 2\sigma)$,
 
 
-# P(µ − 2σ < X < µ + 2σ) = F(µ + 2σ) - F(µ - 2σ)
-# X~N(µ,σ)
-# je jedno jaké hodnoty zvolíme
-mu <- -105.5447
-sigma <- 2.654
+# P(µ − 2σ < X < µ + 2σ) = F_X(µ + 2σ) - F_X(µ - 2σ)
+# Z = (X - µ)/σ ~N(0,1)
+# P(µ − 2σ < X < µ + 2σ) = P(-2 < Z < 2) = F_Z(2) - F_Z(-2)
 
-pnorm(mu + 2 * sigma, mean = mu, sd = sigma) -
-    pnorm(mu - 2 * sigma, mean = mu, sd = sigma)
+pnorm(2, mean = 0, sd = 1) - pnorm(-2, mean = 0, sd = 1)
 
 
-# ** b) ####
-# nejmenší k ∈ Z, tak, aby P(µ − kσ < X < µ + kσ) > 0,99.
+# **b)**
+# nejmenší $k \in  \mathbb{Z}$, tak, aby $P(\mu − k\sigma < X < \mu + k\sigma) > 0.99$.
 
 
 # normální rozdělení je symetrické
-# P(µ − kσ < X < µ + kσ) =
-# = 1 - (P(X < µ − kσ ) + P(X > µ + kσ)) =
-# = 1 - 2*P(X > µ + kσ) = 0.99 -> P(X > µ + kσ) = 0.005
-# -> P(X < µ + kσ) = 0.995
+# P(µ − kσ < X < µ + kσ) = P(-k < Z < k) = F_Z(k) - F_Z(-k) = 2F_Z(k) - 1 = 0.99
+# F_Z(k) = 0.995
 
-# x = µ + kσ
-x <- qnorm(0.995, mean = mu, sd = sigma)
-(x - mu) / sigma
+k <- qnorm(0.995, mean = 0, sd = 1)
+k
 
 
 for (k in 1:5) {
-    p <- pnorm(mu + k * sigma, mean = mu, sd = sigma) -
-        pnorm(mu - k * sigma, mean = mu, sd = sigma)
+    p <- pnorm(k, mean = 0, sd = 1) - pnorm(-k, mean = 0, sd = 1)
     print(paste0(k, ":", p))
 }
 
@@ -400,7 +359,7 @@ a <- 0
 b <- 20
 
 
-# ** a) ####
+# **a)**
 # nebudete na začátek filmu čekat víc než 5 minut,
 
 
@@ -408,7 +367,7 @@ b <- 20
 punif(5, a, b)
 
 
-# ** b) ####
+# **b)**
 # budete čekat mezi 5 a 10 minutami,
 
 
@@ -416,7 +375,7 @@ punif(5, a, b)
 punif(10, a, b) - punif(5, a, b)
 
 
-# ** c) ####
+# **c)**
 # střední hodnotu a směrodatnou odchylku doby čekání na začátek filmu.
 
 
@@ -448,10 +407,12 @@ pnorm(27, mean = mu, sd = sigma) - pnorm(26, mean = mu, sd = sigma)
 
 
 # * Příklad 9. ####
-# Délka skoků sportovce Jakuba měřená v cm má normální rozdělení N(µ1; σ1), kde µ1 = 690
-# a σ1 = 10. Délka skoků sportovce Aleše měřená v cm má také normální rozdělení N(µ2;
-# σ2), kde µ2 = 705 a σ2 = 15. Na závody se kvalifikuje ten, kdo ze dvou skoků alespoň
-# jednou skočí více než 700 cm.
+# Délka skoků sportovce Jakuba měřená v cm má normální rozdělení $N(\mu_1; \sigma_1^2)$,
+# kde $\mu_1 = 690$ a $\sigma_1 = 10$. Délka skoků sportovce Aleše měřená v cm má také
+# normální rozdělení $N(\mu_2; \sigma_2^2)$, kde $\mu_2 = 705$ a $\sigma_2 = 15$. Na
+# závody se kvalifikuje ten, kdo ze dvou skoků alespoň jednou skočí více než 700 cm.
+#
+# **a)** S Jakou pravděpodobností bude skok Jakuba (a Aleše) kvalifikační?
 
 
 # SJ ... délka skoku Jakuba
@@ -476,6 +437,9 @@ P.A <- 1 - pnorm(700, mean = mu_A, sd = sigma_A)
 P.A
 
 
+# **b)** S jakou pravděpodobností se kvalifikuje Jakub (a Aleš)?
+
+
 # KJ … Jakub se kvalifikuje na závody,
 # P(KJ) = 1-(1-P(J))(1-P(J))
 P.KJ <- 1 - (1 - P.J) * (1 - P.J)
@@ -487,19 +451,15 @@ P.KA <- 1 - (1 - P.A) * (1 - P.A)
 P.KA
 
 
-# ** a) ####
+# **c)**
 # S jakou pravděpodobností se oba dva kvalifikují na závody?
 
 
-# ada)
 P.KJ * P.KA
 
 
-# ** b) ####
+# **d)**
 # S jakou pravděpodobností se kvalifikuje Aleš, ale Jakub ne?
 
 
-
-
-# adb)
 (1 - P.KJ) * P.KA

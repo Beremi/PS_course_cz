@@ -7,7 +7,10 @@
 # Pro zobrazení obsahu skriptu použijte CTRL+SHIFT+O
 # Pro spouštění příkazů v jednotlivých řádcích použijte CTRL+ENTER
 
-#  Demonstrace na úvod - co je to intervalový odhad? ####
+# Importujeme dplyr
+library(dplyr)
+
+#  1. Demonstrace na úvod - co je to intervalový odhad? ####
 # Uvažujme náhodnou veličinu z normálního rozdělení se střední hodnotou $\mu$ a
 # směrodatnou odchylkou $\sigma$. Budeme pracovat s výběry z této náhodné veličiny a
 # pomoci jich se budeme snažit odhadnout střední hodnutu rozdělení (zde známe její
@@ -40,18 +43,18 @@ boxplot(vyber)
 # ** Samotné sestrojení Intervalového odhadu pomocí výběrové charakteristiky ####
 # Použijeme tuto výběrovou charakteristiku: (předpokládáme, že neznáme žádné skutečné
 # parametry rozdělení, pouze to, že je normální)
-# $Y=\frac{\bar X - \mu}{S}\sqrt{n} \sim t_{n-1}$
+# $$Y=\frac{\bar X - \mu}{S}\sqrt{n} \sim t_{n-1}$$
 # Jelikož, známe rozdělení Y jsme schopni napočítat $a$ a $b$ v následujícím výrazu:
-# $P(a<Y<b)\geq 1 - \alpha$
+# $$P(a<Y<b)\geq 1 - \alpha$$
 # - $\alpha$ nazýváme hladinou významnosti (pravděpodobnost, že hledaná hodnota leží
 # mimo náš interval)
 # - $1-\alpha$ nazýváme spolehlivost intervalového odhadu
 
 
 # $a$ a $b$ zvolíme tak aby byly v pravděpodobnosti symetrické, tzn.:
-# - $P(Y<a)\leq \alpha / 2 \rightarrow a=t_{\alpha / 2;n-1}$
-# - $P(b<Y)\leq \alpha / 2 \rightarrow P(Y\leq b)\geq 1 - \alpha / 2 \rightarrow
-# b=t_{1-\alpha / 2;n-1}$
+# $$P(Y<a)\leq \frac{\alpha}{2} \rightarrow a=t_{n-1}^{\frac{\alpha}{2}}$$
+# $$P(b<Y)\leq \frac{\alpha}{2} \rightarrow P(Y\leq b)\geq 1 - \frac{\alpha}{2}
+# \rightarrow b=t_{n-1}^{1-\frac{\alpha}{2}}$$
 
 
 # maximální pravděpodobnost s jakou připouštíme aby
@@ -67,10 +70,11 @@ t_high
 
 
 # Dále jen doplníme do výrazu a upravíme:
-# $P(t_{\alpha / 2;n-1}<\frac{\bar X - \mu}{S}\sqrt{n}<t_{1-\alpha / 2;n-1})\geq 1 -
-# \alpha$
-# $P(\bar X - t_{1-\alpha / 2;n-1}\frac{S}{\sqrt{n}}<\mu<\bar X - t_{\alpha /
-# 2;n-1}\frac{S}{\sqrt{n}})\geq 1 - \alpha$
+#
+# $$P\left(t_{n-1}^{\frac{\alpha}{2}}<\frac{\bar X -
+# \mu}{S}\sqrt{n}<t_{n-1}^{1-\frac{\alpha}{2}}\right)\geq 1 - \alpha$$
+# $$P\left(\bar X - t_{n-1}^{1-\frac{\alpha}{2}}\frac{S}{\sqrt{n}}<\mu<\bar X -
+# t_{n-1}^{\frac{\alpha}{2}}\frac{S}{\sqrt{n}}\right)\geq 1 - \alpha$$
 
 
 I_dolni <- X - t_high * S / sqrt(n)
@@ -84,10 +88,14 @@ paste("P(", I_dolni, " < µ < ", I_horni, ") ≥ ", 1 - alpha)
 t.test(vyber, alternative = "two.sided", conf.level = 1 - alpha)$conf.int
 
 
-# ** Otestování intervalového odhadu na více výběrech ####
+# *** Otestování intervalového odhadu na více výběrech ####
+#
+# - pro normální rozdělení provedeme mnoho výběrů o velikosti 30
+# - srovnáme intervalový odhad s reálnou (známou) hodnotou střední hodnoty
+# - počet "špatných" intervalů by měl být roven hladině významnosti $\alpha$ (limitně)
 
 
-pocet_pokusu <- 10000 # počet výběrů
+pocet_pokusu <- 100 # počet výběrů
 
 n <- 30 # velikost výběru
 mu <- 100 # střední hodnota
@@ -127,11 +135,10 @@ paste(
 )
 
 
-# vrátím šířku na standardní velikost
-options(repr.plot.width = 8) # šířka grafů v Jupyteru
+# ---
 
 
-#  Typy intervalových odhadů ####
+#  2. Typy intervalových odhadů ####
 # (Ukázky na odhadu střední hodnoty dat z normálního rozdělení.)
 # * Dolní/Levostranný IO ####
 # - $P(M_D^* < \mu) = 1-\alpha$
@@ -163,13 +170,16 @@ alpha <- 0.05
 t.test(vyber, alternative = "two.sided", conf.level = 1 - alpha)$conf.int
 
 
-#  Přehled parametrů výběru a jejich bodových/intervalových odhadů ####
+# ---
+
+
+#  3. Přehled parametrů výběru a jejich bodových/intervalových odhadů ####
 # Běžně máme k dispozici více konstrukcí IO (funkcí v Rku které to za nás udělají), ale
 # každá konstrukce má jiné požadavky na data a vytváří různě "kvalitní" (ve smyslu
 # velikosti IO) odhady. My budeme vždy vybírat "nejkvalitnější" IO, který **má splněny**
 # předpoklady použití.
 # Pořadí různých IO níže bude vždy od "nejlepšího" po nejrobustnější.
-# * Míry polohy jednoho výběru ####
+# * I. Míry polohy jednoho výběru ####
 # Mírami polohy rozumíme údaj určující polohu dat, nehledě na tom jak jsou rozptýlená.
 # Pro data z normálního rozdělení můžeme odhadovat střední hodnotu, pro ostatní medián.
 # *** a) studentův t-test IO ####
@@ -186,8 +196,6 @@ alpha <- 0.05
 
 
 # exploračně test normality
-# library(moments) - tomuto se můžeme vyhnout voláním moments::
-# je to bezpečnější - máme jistotu, že voláme funkci z tohoto balíčku
 moments::skewness(vyber)
 moments::kurtosis(vyber) - 3
 qqnorm(vyber)
@@ -226,8 +234,7 @@ hist(vyber, breaks = 5)
 
 # exaktně: test symetrie
 # install.packages("lawstat")
-library(lawstat)
-symmetry.test(vyber, boot = FALSE)$p.value
+lawstat::symmetry.test(vyber, boot = FALSE)$p.value
 # vysledná p-hodnota musím být větší než hl. výz. (př. 0.05)
 
 
@@ -263,14 +270,13 @@ qexp(p = 0.5, rate = 1 / 100)
 median(vyber)
 # IO
 # install.packages("BSDA")
-library(BSDA)
-SIGN.test(vyber,
+BSDA::SIGN.test(vyber,
     alternative = "two.sided", conf.level = 1 - alpha,
     conf.int = TRUE
 )$conf.int
 
 
-# * Míry variability jednoho výběru ####
+# * II. Míry variability jednoho výběru ####
 # Mírami variability rozumíme údaj určující rozptýlenost/variabilitu dat, nehledě na
 # celkových hodnotách. Pro data z normálního rozdělení můžeme odhadovat směrodatnou
 # odchylku.
@@ -305,20 +311,41 @@ shapiro.test(vyber)$p.value
 sd(vyber)
 # IO
 # install.packages("EnvStats")
-library(EnvStats)
-sqrt(varTest(vyber, alternative = "two.sided", conf.level = 1 - alpha)$conf.int)
+sqrt(EnvStats::varTest(vyber, alternative = "two.sided", conf.level = 1 - alpha)$conf.int)
 
 
-# Přidáme si ruční výpočet:
-# - vycházíme ze statistiky: $\frac{S^2}{\sigma^2}(n-1) \sim \chi^2_{n-1}$
-# - Horní mez:
-#     - $P(\frac{S^2}{\sigma^2}(n-1) < \chi^2_{\alpha /2, n-1}) = \alpha /2$
-#     - $P(\frac{S^2}{\chi^2_{\alpha /2, n-1}}(n-1) < \sigma^2 ) = \alpha /2$
-# - Dolní mez:
-#     - $P(\frac{S^2}{\sigma^2}(n-1) > \chi^2_{1-\alpha /2, n-1}) = \alpha /2$
-#     - $P(\frac{S^2}{\chi^2_{1-\alpha /2, n-1}}(n-1) > \sigma^2 ) = \alpha /2$
-# - Dohromady: $P(\frac{S^2}{\chi^2_{1-\alpha /2, n-1}}(n-1) < \sigma^2
-# <\frac{S^2}{\chi^2_{\alpha /2, n-1}}(n-1)) = 1 - \alpha$
+# *** Přidáme si ruční výpočet: ####
+#
+# $$
+# \frac{S^2}{\sigma^2} (n-1) \sim \chi^2_{n-1}
+# $$
+#
+# Horní mez:
+#
+# $$
+# P\left(\frac{S^2}{\sigma^2} (n-1) < \chi^{\frac{\alpha}{2}}_{n-1} \right) =
+# \frac{\alpha}{2}
+# \quad \Rightarrow \quad
+# P\left(\frac{S^2}{\chi^{\frac{\alpha}{2}}_{n-1}} (n-1) < \sigma^2 \right) =
+# \frac{\alpha}{2}
+# $$
+#
+# Dolní mez:
+#
+# $$
+# P\left(\frac{S^2}{\sigma^2} (n-1) > \chi^{1-\frac{\alpha}{2}}_{n-1} \right) =
+# \frac{\alpha}{2}
+# \quad \Rightarrow \quad
+# P\left(\frac{S^2}{\chi^{1-\frac{\alpha}{2}}_{n-1}} (n-1) > \sigma^2 \right) =
+# \frac{\alpha}{2}
+# $$
+#
+# Dohromady:
+#
+# $$
+# P\left(\frac{S^2}{\chi^{1-\frac{\alpha}{2}}_{n-1}} (n-1) < \sigma^2 <
+# \frac{S^2}{\chi^{\frac{\alpha}{2}}_{n-1}} (n-1) \right) = 1 - \alpha
+# $$
 
 
 # ruční výpočet
@@ -337,11 +364,11 @@ sqrt(S^2 * (n - 1) / dol_q)
 sqrt(S^2 * (n - 1) / hor_q)
 
 
-# * Pravděpodobnost výskytu u jednoho výběru ####
+# * III. Pravděpodobnost výskytu u jednoho výběru ####
 # *** IO pravděpodobnosti ####
 # - odhadujeme pravděpodobnost - bodový odhad je relativní četnost
 # - vyžadujeme dostatečný počet dat: $n>\frac{9}{p(1-p)}$
-# - Clopperův - Pearsonův odhad (binom.test)
+# - **Clopperův - Pearsonův odhad (`binom.test`)**
 #     - jako parametr nebere data, ale počet úspěchů a počet pozorování
 # - Waldův - z výběrových charakteristik
 
@@ -380,8 +407,10 @@ p - dol_q * sqrt(p * (1 - p) / n) # horní mez IO
 # Výpočet 11 nejčastěji používaných intervalů spolehlivosti param. bin. rozdělení
 # pomocí balíčku binom
 # install.packages("binom")
-library(binom)
-binom.confint(n = celk_pocet, x = pocet_poz)
+binom::binom.confint(n = celk_pocet, x = pocet_poz)
+
+
+# ---
 
 
 #  Příklady ####
@@ -420,7 +449,7 @@ sqrt((n - 1) * s^2 / dol_q) # horní mez IO
 # * Příklad 2. ####
 # Hloubka moře se měří přístrojem, jehož systematická chyba je rovna nule a náhodné
 # chyby mají normální rozdělení se směrodatnou odchylkou 20 m. Kolik nezávislých měření
-# je třeba provést,aby s pravděpodobností 95 % stanovila hloubku s chybou menší než 10
+# je třeba provést, aby s pravděpodobností 95 % stanovila hloubku s chybou menší než 10
 # m?
 
 
@@ -440,6 +469,29 @@ delta <- 10 # metrů ... přípustná chyba měření
 
 
 # * Příklad 3. ####
+# Jaký musí být počet pozorování, jestliže chceme s pravděpodobností 0,95 stanovit
+# průměrnou hodnotu hemoglobinu u novorozenců s chybou nejvýše 1,0 $g/l$. Populační
+# rozptyl hodnot se
+# odhaduje hodnotou 46,0 $g^2/l^2$.
+
+
+# Určujeme odhad potřebného rozsahu výb. (počtu novorozenců, které musíme testovat)
+
+# Předpokládáme normalitu dat, bez tohoto předpokladu je příklad neřešitelný
+
+sigma <- sqrt(46) # g/l .... známá směrodatná odchylka
+alpha <- 0.05 # hladina významnosti (spolehlivost 1-alpha = 0.95)
+delta <- 1 # g/l ... přípustná chyba měření
+
+
+# Odhad rozsahu výběru
+# Y = delta/sigma*sqrt(n) ~ N(0,1), delta = X-mu
+# P(Y > Z_(1-alpha/2)) = alpha/2
+
+(qnorm(1 - alpha / 2) * sigma / delta)^2
+
+
+# * Příklad 4. ####
 # Úkolem je určit průměrnou hladinu cholesterolu v séru v určité populaci mužů. V
 # náhodném výběru (pocházejícím z normálního rozdělení ) 25 mužů je výběrový průměr 6,3
 # mmol/l a výběrová směrodatná odchylka 1,3 mmol/l.
@@ -462,7 +514,7 @@ x.bar - hor_q * s / sqrt(n) # dolní mez IO
 x.bar - dol_q * s / sqrt(n) # horní mez IO
 
 
-# * Příklad 4. ####
+# * Příklad 5. ####
 # Předpokládejme, že v náhodném výběru 200 mladých mužů má 120 z nich vyšší než
 # doporučenou hladinu cholesterolu v séru. Určete 95% interval spolehlivosti pro
 # procento mladých mužů
@@ -487,7 +539,7 @@ alpha <- 0.05 # hladina významnosti (spolehlivost 1-alpha = 0.95)
 binom.test(x, n, alternative = "two.sided", conf.level = 0.95)$conf.int
 
 
-## Waldův (asymptotický) odhad (z-statistika) - aprox. normálním rozdělením dle CLV
+# Waldův (asymptotický) odhad (z-statistika) - aprox. normálním rozdělením dle CLV
 dol_q <- qnorm(alpha / 2)
 hor_q <- qnorm(1 - alpha / 2)
 
@@ -495,45 +547,30 @@ p - hor_q * sqrt(p * (1 - p) / n) # dolní mez IO
 p - dol_q * sqrt(p * (1 - p) / n) # horní mez IO
 
 
-# * Příklad 5. ####
+# * Příklad 6. ####
 # V rámci výzkumné studie pracujeme s náhodným výběrem 70 žen z české populace. U každé
 # z žen byl změřen hemoglobin s přesností 0,1 g/100 ml. Naměřené hodnoty jsou v uvedeny
-# v souboru Hemoglobin.xls. Nalezněte 95% intervalové odhady směrodatné odchylky a
-# střední hodnoty hemoglobinu v populaci českých žen. (Normalitu ověřte na základě
-# exploračních grafů.)
+# v souboru `data/intervalove_odhady.xlsx` na stránce `Hemoglobin`. Nalezněte 95%
+# intervalové odhady směrodatné odchylky a střední hodnoty hemoglobinu v populaci
+# českých žen. (Normalitu ověřte na základě exploračních grafů.)
 
 
-## Odhadujeme střední hodnotu a směrodatnou odchylku hemoglobinu v séru
+# Odhadujeme střední hodnotu a směrodatnou odchylku hemoglobinu v séru
 
-## Načtení dat z xlsx souboru (pomoci balíčku readxl)
-library(readxl)
-hem <- read_excel("data/intervalove_odhady.xlsx",
+# Načtení dat z xlsx souboru (pomoci balíčku readxl)
+hem <- readxl::read_excel("data/intervalove_odhady.xlsx",
     sheet = "Hemoglobin"
 )
 colnames(hem) <- "hodnoty"
 head(hem)
 
 
-## Explorační analýza
+# Explorační analýza - Zhodnocení OP
 boxplot(hem$hodnoty)
 
 
-# Data neobsahují odlehlá pozorování.
-summary(hem$hodnoty)
-sd(hem$hodnoty)
-
-
-# Ověření normality - exploračně
-qqnorm(hem$hodnoty)
-qqline(hem$hodnoty)
-
-moments::skewness(hem$hodnoty)
-moments::kurtosis(hem$hodnoty) - 3
-# Šikmost i špičatost odpovídá norm. rozdělení.
-
-
 # ověření normality: exaktně - test normality.
-# Známe-li testování hypotéz, ověříme Shapirovým . Wilkovým testem.
+# ověříme Shapirovým . Wilkovým testem.
 shapiro.test(hem$hodnoty)$p.value
 # Na hl. významnosti 0.05
 
@@ -544,140 +581,93 @@ t.test(hem$hodnoty, altarnative = "two.sided", conf.level = 0.95)$conf.int
 
 
 ## 95% oboustranný intervalový odhad směrodatné odchylky
-library(EnvStats)
 sd(hem$hodnoty)
 
-sqrt(varTest(hem$hodnoty, alternative = "two.sided", conf.level = 0.95)$conf.int)
+IO_rozptyl <- EnvStats::varTest(hem$hodnoty, alternative = "two.sided", conf.level = 0.95)$conf.int
+
+sqrt(IO_rozptyl)
 
 
-# * Příklad 6. ####
-# Jaký musí být počet pozorování, jestliže chceme s pravděpodobností 0,95 stanovit
-# průměrnou hodnotu hemoglobinu u novorozenců s chybou nejvýše 1,0 $g/l$. Populační
-# rozptyl hodnot se
-# odhaduje hodnotou 46,0 $g^2/l^2$.
-
-
-# Určujeme odhad potřebného rozsahu výb. (počtu novorozenců, které musíme testovat)
-
-# Předpokládáme normalitu dat, bez tohoto předpokladu je příklad neřešitelný
-
-sigma <- sqrt(46) # g/l .... známá směrodatná odchylka
-alpha <- 0.05 # hladina významnosti (spolehlivost 1-alpha = 0.95)
-delta <- 1 # g/l ... přípustná chyba měření
-
-
-# Odhad rozsahu výběru
-# Y = delta/sigma*sqrt(n) ~ N(0,1), delta = X-mu
-# P(Y > Z_(1-alpha/2)) = alpha/2
-
-(qnorm(1 - alpha / 2) * sigma / delta)^2
+# jaká je přesnost zaokrouhlení (pro intervalové odhady)?
+length(hem$hodnoty)
 
 
 # * Příklad 7. ####
-# V datovém souboru pr7.xlsx naleznete měření hluku způsobeného větrákem počítače [dB].
-# Spočtěte 95% intervalový odhad průměrného hluku a 95% intervalový odhad variability
-# hluku.
+# V datovém souboru `data/pr7.xlsx` naleznete měření hluku způsobeného větrákem počítače
+# [dB]. Spočtěte 95% intervalový odhad průměrného hluku a 95% intervalový odhad
+# variability hluku.
 
 
-library(readxl)
 # načtení dat
-data <- read_excel("data/pr7.xlsx")
+data <- readxl::read_excel("data/pr7.xlsx")
 head(data)
 
 
-length(data$dB)
-
-
-# vizualizace
-pom <- boxplot(data$dB)
+# zhodnocení OP
+boxplot(data$dB)
 
 
 # odstranění OP
-data_op <- data
-data_op$dB[data_op$dB %in% pom$out] <- NA
-data_op <- na.omit(data_op)
-boxplot(data_op$dB)
+data_op <- data %>% rstatix::identify_outliers(dB)
+data_op
 
-
-# test normality dat exploračně
-moments::skewness(data_op$dB)
-moments::kurtosis(data_op$dB) - 3
-
-qqnorm(data_op$dB)
-qqline(data_op$dB)
-
+data <- data %>% mutate(dBOP = ifelse(ID %in% data_op$ID, NA, dB))
+boxplot(data$dBOP)
 
 # test normality exaktně
-shapiro.test(data_op$dB)$p.value
+shapiro.test(data$dBOP)$p.value
 
 
 # bodový a intervalový odhad střední hodnoty
-mean(data_op$dB)
+mean(data$dBOP, na.rm = TRUE)
 
-t.test(data_op$dB, alternative = "two.sided", conf.level = 0.95)$conf.int
+t.test(data$dBOP, alternative = "two.sided", conf.level = 0.95)$conf.int
 
 
 # bodový a intervalový odhad směrodatné odchylky
-sd(data_op$dB)
+sd(data$dBOP, na.rm = TRUE)
 
-sqrt(varTest(data_op$dB, alternative = "two.sided", conf.level = 0.95)$conf.int)
+IOvar <- EnvStats::varTest(data$dBOP, alternative = "two.sided", conf.level = 0.95)$conf.int
+sqrt(IOvar)
 
+
+# na jakou přesnost můžeme zaokrouhlit?
+sum(!is.na(data$dBOP))
 
 # * Příklad 8. ####
-# V datovém souboru pr8.xlsx naleznete měření doby do poruchy elektrické součástky [h].
-# Spočtěte 99% intervalový odhad průměrné životnosti daného typu součastky.
+# V datovém souboru `data/pr8.xlsx` naleznete měření doby do poruchy elektrické
+# součástky [h]. Spočtěte 99% intervalový odhad průměrné životnosti daného typu
+# součastky.
 
 
-library(readxl)
 # načtení dat
-data <- read_excel("data/pr8.xlsx")
+data <- readxl::read_excel("data/pr8.xlsx")
 head(data)
-
-
-length(data$cas_h)
 
 
 # vizualizace a ověření OP
 boxplot(data$cas_h)
 
 
+# jedná se skutečně o OP? nebo rozdělení je "odlišné" od normálního?
+# např. exponenciální...
+
 hist(data$cas_h)
+# dle histogramu to vypadá, že data pocházejí z exponenciálního rozdělení
+# tedy identifikované "OP" jsou ve skutečnosti "správná" data
 
-
-# test normality dat exploračně
-moments::skewness(data$cas_h)
-moments::kurtosis(data$cas_h) - 3
-
-qqnorm(data$cas_h)
-qqline(data$cas_h)
-
-
-# test normality exaktně
-shapiro.test(data$cas_h)$p.value
-
-
-# test symetrie exploračně
-moments::skewness(data$cas_h)
-hist(data$cas_h)
-
-
-# exaktně: test symetrie
-# install.packages("lawstat")
-library(lawstat)
-symmetry.test(data$cas_h, boot = FALSE)$p.value
-# vysledná p-hodnota musím být větší než hl. výz. (př. 0.05)
-
-
-# bodový a intervalový odhad mediánu
+# můžeme jít rovnou bodový a intervalový odhad mediánu
+# tedy znaménkový test, exponentiální rozdělení není symetrické
 median(data$cas_h)
 # IO
 # install.packages("BSDA")
 alpha <- 0.01
-library(BSDA)
-SIGN.test(data$cas_h,
+BSDA::SIGN.test(data$cas_h,
     alternative = "two.sided", conf.level = 1 - alpha,
     conf.int = TRUE
 )$conf.int
 
 
+# na jakou přesnost můžeme zaokrouhlit?
+length(data$cas_h)
 sd(data$cas_h)

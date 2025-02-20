@@ -13,10 +13,12 @@
 data <- readxl::read_excel("data/snehurka.xlsx")
 # data jsou ve standardním dtovém formátu
 
+
 # POST-HOC ANOVA
 vysledky <- aov(data$hodnota ~ data$typ)
 PH.ANOVA <- TukeyHSD(vysledky)[[1]]
 PH.ANOVA
+
 
 # počítání efektů ANOVA
 library(dplyr)
@@ -36,6 +38,7 @@ efekty$efekt <- efekty$mean_skup - prumer_vsech
 efekty.ANOVA <- efekty %>% arrange(desc(efekt))
 efekty.ANOVA
 
+
 # POST-HOC KW
 # post hoc - jiná funkce s výstupem, který se nám více hodí
 # číselně odpovídá té použité na cvičení
@@ -46,6 +49,7 @@ result <- FSA::dunnTest(data$hodnota ~ data$typ, # library FSA
 )
 PH.KW <- result$res
 PH.KW
+
 
 # počítání efektů KW
 library(dplyr)
@@ -65,6 +69,7 @@ efekty$efekt <- efekty$mean_skup - prumer_vsech
 efekty.KW <- efekty %>% arrange(desc(efekt))
 efekty.KW
 
+
 #  Pro zájemce (nepovinné) - vytvoření setřízené tabulky p-hodnot/pisménkové schéma ####
 # automatizovaně
 
@@ -81,6 +86,7 @@ colnames(POST.HOC.Phodnoty) <- efekty.ANOVA$typ
 rownames(POST.HOC.Phodnoty) <- efekty.ANOVA$typ
 POST.HOC.Phodnoty
 
+
 # smyčka přes všechny testy v post-hoc (řes názvy sloupců)
 for (pair.test in rownames(PH.ANOVA)) {
     # kteří trpaslíci jsou přítomni v tomto párovém testu?
@@ -96,6 +102,7 @@ for (pair.test in rownames(PH.ANOVA)) {
     # převedou na text), hodnoty na tisíciny
 }
 POST.HOC.Phodnoty
+
 
 # ** Funkce pro aoutomatizované znaménkové schéma (ručně napsané a z balíčku) ####
 # *** Ručně napsané funkce (to co bychom dělali na papír) ####
@@ -128,6 +135,7 @@ tabulka.phodnot <- function(setrizene.typy, parove.testy.nazvy,
     return(POST.HOC.Phodnoty)
 }
 
+
 # písmenkové schéma z tabulky
 
 pismenkove.schema <- function(POST.HOC.Phodnoty, alpha) {
@@ -151,6 +159,7 @@ pismenkove.schema <- function(POST.HOC.Phodnoty, alpha) {
     return(pis.schema)
 }
 
+
 # *** Jak použít ručně napsané funkce pro ANOVU a KW test? ####
 
 
@@ -173,6 +182,7 @@ round(p.val.tab, digits = 3)
 pis.schema <- pismenkove.schema(p.val.tab, 0.05)
 pis.schema
 
+
 # Jak to udělat z POST-HOC KW:
 
 # vyrobíme vstupní data
@@ -192,6 +202,7 @@ round(p.val.tab, digits = 3)
 pis.schema <- pismenkove.schema(p.val.tab, 0.05)
 pis.schema
 
+
 # * Písmenkové schéma pomocí vestavěné Rkové funkce ####
 # Balíček rcompanion, funkce cldList
 
@@ -200,28 +211,31 @@ pis.schema
 
 # nejprve vyrobíme dataframe se sloupci dvojic a phodnot
 input <- data.frame(
-    dvojice = rownames(PH.ANOVA),
-    pval = PH.ANOVA[, "p adj"]
+        dvojice = rownames(PH.ANOVA),
+        pval = PH.ANOVA[, "p adj"]
 )
 
 # písmenkové schéma, library rcompanion
 # install.packages("rcompanion")
 rcompanion::cldList(pval ~ dvojice,
-    data = input,
-    threshold = 0.05
+        data = input,
+        threshold = 0.05
 )
+
 
 # v případě KW
 
 # nejprve vyrobíme dataframe se sloupci dvojic a phodnot
 input <- data.frame(
-    dvojice = PH.KW$Comparison,
-    pval = PH.KW$P.adj
+        dvojice = PH.KW$Comparison,
+        pval = PH.KW$P.adj
 )
 
 # písmenkové schéma, library rcompanion
 # install.packages("rcompanion")
 rcompanion::cldList(pval ~ dvojice,
-    data = input,
-    threshold = 0.05
+        data = input,
+        threshold = 0.05
 )
+
+

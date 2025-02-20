@@ -1,18 +1,20 @@
 # ......................................................................................
 # ......................... Cvičení 7. Výběrové charakteristiky.........................
-# ..................................... Michal Béreš....................................
+# .................. Michal Béreš, Martina Litschmannová, Adéla Vrtková.................
 # ......................................................................................
 
 # Nezobrazuje-li se vám text korektně, nastavte File \ Reopen with Encoding... na UTF-8
 # Pro zobrazení obsahu skriptu použijte CTRL+SHIFT+O
 # Pro spouštění příkazů v jednotlivých řádcích použijte CTRL+ENTER
 
-#  Další vybraná spojitá rozdělení ####
-# * $\chi^2$ - Chí-kvadrát rozdělení (Pearsnovo rozdělení) ####
-# - Použítí: při odhadu směrodatné odchylky (za použití výběrové)
-# - Má jediný parametr - počet stupňů volnosti
-# - $\frac{S^2}{\sigma^2}(n-1) \sim \chi^2_{n-1}$
-#     - $S$ je výběrová směrodatná odchylka
+#  1. Další vybraná spojitá rozdělení ####
+#
+# * $\chi^2$ - Chí-kvadrát rozdělení (Pearsonovo rozdělení) ####
+#
+# - **Použití**: při odhadu směrodatné odchylky (za použití výběrové)
+# - Má jediný parametr – **počet stupňů volnosti**
+# $$\frac{S^2}{\sigma^2} (n-1) \sim \chi^2_{n-1}$$
+# - $S$ je výběrová směrodatná odchylka
 
 
 n <- 5 # počet stupňů volnosti
@@ -28,12 +30,13 @@ plot(x, Fx, type = "l")
 
 
 # * $t$ - Studentovo rozdělení ####
-# - Použití: při odhadu střední hodnoty bez přesné znalosti rozptylu (pouze výběrového
-# rozptylu)
-# - $\frac{\bar X - \mu}{S}\sqrt{n} \sim t_{n-1} $
-#     - $\bar X$ je výběrový průměr
-#     - $S$ je výběrová směrodatná odchylka
-# - s rostoucím počtem stupňů volnosti konverguje k normovanému normálnímu rozdělení
+#
+# - **Použití**: při odhadu střední hodnoty bez přesné znalosti rozptylu (pouze
+# výběrového rozptylu)
+# $$\frac{\bar{X} - \mu}{S} \sqrt{n} \sim t_{n-1}$$
+# - $\bar{X}$ je výběrový průměr
+# - $S$ je výběrová směrodatná odchylka
+# - S rostoucím počtem stupňů volnosti konverguje k normovanému normálnímu rozdělení.
 
 
 n <- 5 # počet stupňů volnosti
@@ -55,8 +58,12 @@ lines(x, Fnorm, col = "red") # do posledního grafu
 
 
 # * $F$ - Fisher-Snedecorovo rozdělení ####
-# - Používá se k testování schody rozptylů
-# - $\frac{S_1^2/\sigma_1^2}{S_2^2/\sigma_2^2} \sim F_{n_1 - 1, n_2 - 1}$
+#
+# - **Použití**: k testování shody rozptylů
+# $$\frac{S_1^2 / \sigma_1^2}{S_2^2 / \sigma_2^2} \sim F_{n_1 - 1, n_2 - 1}$$
+# - $S_1^2$ a $S_2^2$ jsou výběrové rozptyly
+# - $\sigma_1^2$ a $\sigma_2^2$ jsou skutečné rozptyly
+# - $n_1$ a $n_2$ jsou počty prvků v obou výběrech
 
 
 n <- 5 # počet stupňů volnosti výběr. 1
@@ -72,9 +79,14 @@ Fx <- pf(q = x, df1 = n, df2 = m) # hustota pravděpodobnosti chí-kvad. rozděl
 plot(x, Fx, type = "l")
 
 
-#  Jak se chová průměr hodnot z normálního rozdělení? ####
-# Funkce **rnorm(n, mean, sd)** generuje **n** hodnot z normálního rozdělení se střední
-# hodnotou **mean** a směrodatnou odchylkou **sd**.
+#  2. Jak se chová průměr hodnot z normálního rozdělení? ####
+#
+# - průměr $$\bar{X} = \frac{1}{n} \sum_{i=1}^{n} X_i$$ je náhodná veličina, tedy každý
+# výběr unikátních $n$ hodnot vede k jiné hodnotě průměru
+# - ukážeme, že průměr hodnot z normálního rozdělení má normální rozdělení
+#
+# Funkce **`rnorm(n, mean, sd)`** generuje **n** hodnot z normálního rozdělení se
+# střední hodnotou **mean** a směrodatnou odchylkou **sd**.
 
 
 vel_nah_vyberu <- 30
@@ -88,16 +100,16 @@ mean(nah_vyber)
 sd(nah_vyber)
 
 
-# ** Náhodná veličina: průměr hodnot ####
+# *** Náhodná veličina: průměr hodnot ####
 
 
 poc_vyberu <- 1000
 prumery <- numeric(poc_vyberu) # numeric vyrobi vektor 0
 smer_odchylky <- numeric(poc_vyberu)
 for (i in 1:poc_vyberu) {
-  nah_vyber <- rnorm(n = vel_nah_vyberu, mean = mu, sd = sigma)
-  prumery[i] <- mean(nah_vyber)
-  smer_odchylky[i] <- sd(nah_vyber)
+    nah_vyber <- rnorm(n = vel_nah_vyberu, mean = mu, sd = sigma)
+    prumery[i] <- mean(nah_vyber)
+    smer_odchylky[i] <- sd(nah_vyber)
 }
 
 
@@ -113,7 +125,11 @@ sd(prumery)
 sigma / sqrt(vel_nah_vyberu)
 
 
-#  Jak se chová průměr hodnot z uniformního rozdělení? ####
+#  3. Jak se chová průměr hodnot z uniformního rozdělení? ####
+#
+# - nyní se podíváme jaké rozdělení má průměr (jako náhodná veličina) hodnot z
+# uniformního rozdělení
+#
 # Fukce **runif(n, min, max)** generuje **n** hodnot z uniformního rozdělení
 # U(**min,max**).
 
@@ -138,16 +154,16 @@ sigma
 sd(nah_vyber)
 
 
-# ** Náhodná veličina: průměr hodnot ####
+# *** Náhodná veličina: průměr hodnot ####
 
 
 poc_vyberu <- 1000
 prumery <- numeric(poc_vyberu)
 smer_odchylky <- numeric(poc_vyberu)
 for (i in 1:poc_vyberu) {
-  nah_vyber <- runif(n = vel_nah_vyberu, min = a, max = b)
-  prumery[i] <- mean(nah_vyber)
-  smer_odchylky[i] <- sd(nah_vyber)
+    nah_vyber <- runif(n = vel_nah_vyberu, min = a, max = b)
+    prumery[i] <- mean(nah_vyber)
+    smer_odchylky[i] <- sd(nah_vyber)
 }
 
 
@@ -163,6 +179,7 @@ sd(prumery)
 sigma / sqrt(vel_nah_vyberu)
 
 
+# ---
 #  Příklady ####
 # * Příklad 1. ####
 # Zatížení letadla s 64 místy nemá překročit 6 000 kg. Jaká je pravděpodobnost, že při
@@ -180,7 +197,8 @@ sigma / sqrt(vel_nah_vyberu)
 # * Příklad 2. ####
 # Zásilka obsahuje 300 výrobků určitého typu. Je známo, že pravděpodobnost zhotovení
 # vadného výrobku tohoto typu je 0,04.
-# ** a)  ####
+#
+# **a)**
 # Odhadněte pravděpodobnost, že absolutní odchylka podílu vadných výrobků v zásilce od
 # pravděpodobnosti vyrobení vadného výrobku bude menší než 1 %.
 
@@ -193,7 +211,7 @@ bound <- 0.01 / sqrt(pi * (1 - pi)) * sqrt(n)
 pnorm(q = bound, mean = 0, sd = 1) - pnorm(q = -bound, mean = 0, sd = 1)
 
 
-# ** b)  ####
+# **b)**
 # Jak se změní výsledek, jestliže zásilka bude obsahovat 3 000 výrobků?
 
 
@@ -268,8 +286,9 @@ P_jedno_mereni^2
 # Z úmrtnostních tabulek vyplývá pravděpodobnost 0,99, že se 35 - letý muž dožije
 # dalšího roku. Roční pojistné této věkové skupiny činí 2 000 Kč, v případě úmrtí
 # pojišťovna vyplatí 100 000 Kč. Jaká je pravděpodobnost, že zisk z 500 pojištěných mužů
-# ve věku 35 let bude alespoň 500 000 Kč? (Řešte dvěma způsoby - pomocí binomického
-# rozdělení a pomoci aproximace binomického rozdělení rozdělením normálním.)
+# ve věku 35 let bude alespoň 500 000 Kč?
+#
+# **a)** Řešte pomocí binomického rozdělení.
 
 
 # X...počet mužů z 500, kteří se nedožijí dalšího roku
@@ -278,6 +297,9 @@ P_jedno_mereni^2
 # P(Z ≥ 500 000) = P(X ≤ 5)
 
 pbinom(5, size = 500, prob = 0.01)
+
+
+# **b)** Řešte pomoci aproximace binomického rozdělení rozdělením normálním.
 
 
 # X ~ Bi(500; 0.01) ~ N(500*0.01; 500*0.01*(1-0.01))
@@ -292,11 +314,17 @@ pnorm(5.5, mean = 500 * 0.01, sd = sqrt(500 * 0.01 * (1 - 0.01)))
 # mladých mužů více než 120 z nich vyšší než doporučenou hladinu cholesterolu v séru?
 
 
+# **a)** Řešte pomocí binomického rozdělení.
+
+
 # X...počet mladých mužů z 200 s vyšší než doporučenou hladinou cholesterolu v séru
 # X ∼ Bi(200; 0.6)
 # P(X > 120) = 1 - P(X ≤ 120)
 
 1 - pbinom(120, size = 200, prob = 0.6)
+
+
+# **b)** Řešte pomocí aproximace binomického rozdělení normálním rozdělením.
 
 
 # X ~ N(200*0.6; 200*0.6(1-0.6)), tj. X ≈ N(120; 48)

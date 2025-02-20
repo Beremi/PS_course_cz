@@ -11,11 +11,11 @@
 # test dobré shody
 # - testujeme zda naměřená data (jejich relativní četnosti) souhlasí s nějakým
 # konkrétním rozdělením (tedy jeho pravděpodobnostmi)
-# - testujeme pomocí $\chi^2$ testu dobré shody
+# - testujeme pomocí $\chi^2$ testu dobré shody 
 # - předpoklady testu: (POZOR týkají se předpokládaných četností - tedy těch které
 # bychom sledovali pokud by naměřená data byla 100% dle rozdělení v hypotéze)
-#     - Očekávané četnosti ≥ 2,
-#     - alespoň 80% očekávaných četností > 5
+#     - Očekávané četnosti ≥ 2, 
+#     - alespoň 80% očekávaných četností > 5 
 # - testová statistika (ta která má $\chi^2$ rozdělení) je $G = \sum_{i = 1}^k (O_i -
 # E_i)^2 / E_i$
 # - rozdělení ma stupeň volnosti $df = k - 1 - h$
@@ -367,13 +367,13 @@ options(repr.plot.width = 12) # šířka grafů v Jupyteru
 par(mfrow = c(1, 2)) # matice grafů 1x2
 
 barplot(t(kont.tab),
-    legend = colnames(kont.tab),
-    beside = TRUE
+        legend = colnames(kont.tab),
+        beside = TRUE
 )
 
 barplot(kont.tab,
-    legend = rownames(kont.tab),
-    beside = TRUE
+        legend = rownames(kont.tab),
+        beside = TRUE
 )
 
 
@@ -383,11 +383,11 @@ options(repr.plot.width = 12) # šířka grafů v Jupyteru
 par(mfrow = c(1, 2)) # matice grafů 1x2
 
 barplot(t(kont.tab),
-    legend = colnames(kont.tab)
+        legend = colnames(kont.tab)
 )
 
 barplot(kont.tab,
-    legend = rownames(kont.tab)
+        legend = rownames(kont.tab)
 )
 
 
@@ -497,7 +497,7 @@ pom
 # „Honolulu Heart Program“ zahájeno sledování 8 006 mužů, z nichž 7 872 nemělo při
 # zahájení studie v anamnéze mrtvici (apoplexii). Z tohoto počtu bylo 3 435 kuřáků a 4
 # 437 nekuřáků. Při jejich sledování po dobu 12 let dostalo mrtvici 171 mužů ve skupině
-# kuřáků a 117 mužů ve skupině nekuřáků.
+# kuřáků a 117 mužů ve skupině nekuřáků. 
 # *** a)  ####
 # Zapište zjištěné výsledky do asociační tabulky.
 
@@ -660,3 +660,5 @@ lsr::cramersV(kont.tab)
 # Chí-kvadrát test dobré shody,
 # df = 1). Pozorovanou závislost lze hodnotit jako velmi slabou
 # (Cramerovo V = 0,061).
+
+

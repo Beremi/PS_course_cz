@@ -1,6 +1,6 @@
 # ......................................................................................
 # .............................Cvičení 1 - Stručný úvod do R............................
-# ..................Adéla Vrtková, Michal Béreš, Martina Litschmannová..................
+# ..................Michal Béreš, Adéla Vrtková, Martina Litschmannová..................
 # ......................................................................................
 
 # Nezobrazuje-li se vám text korektně, nastavte File \ Reopen with Encoding... na UTF-8
@@ -10,7 +10,7 @@
 # Nejprve si projdeme některé základy Rka a naimplementujeme si některé kombinatorické
 # funkce.
 #
-#  Krátký úvod do R ####
+#  1. Krátký úvod do R ####
 
 
 # jednoduché početní operace
@@ -46,7 +46,7 @@ d <- 3 + 1i
 class(d)
 
 
-# * datové struktury v R ####
+#  2. datové struktury v R ####
 #
 # - vector (rozumíme sloupcový vektor)
 # - factor (speciální případ vektoru)
